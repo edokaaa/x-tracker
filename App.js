@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import AuthStack from './navigation/AuthStack';
+import AppStack from './navigation/AppStack';
 
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
@@ -23,6 +24,9 @@ const styles = StyleSheet.create({
 });
 
 function App() {
+    return (
+        <AppStack />
+    )
     return (
         <NavigationContainer>
             <AuthStack />

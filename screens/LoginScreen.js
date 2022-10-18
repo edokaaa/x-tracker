@@ -8,6 +8,9 @@ import LoginSVG from '../assets/images/misc/login.svg';
 import CustomButton from '../components/CustomButton';
 import UserInput from '../components/UserInput';
 
+import AppStack from '../navigation/AppStack';
+
+
 const LoginScreen = ({navigation}) => {
     return (
         <SafeAreaView
@@ -30,7 +33,7 @@ const LoginScreen = ({navigation}) => {
             />
             <CustomButton
                 label={'Login'}
-                onPress={() => navigation.navigate('Register')}
+                onPress={() => navigation.navigate('Dashboard')}
                 />
             <TouchableOpacity
                 style={{
