@@ -22,7 +22,7 @@ const Tab = createBottomTabNavigator();
 
 const AppStack = () => {
     return (
-        <NavigationContainer>
+        // <NavigationContainer>
             <Tab.Navigator
                 initialRouteName={dashboardName}
                 screenOptions={({route}) => ({
@@ -62,7 +62,7 @@ const AppStack = () => {
                 <Tab.Screen name={settingsName} component={SettingsScreen} />
             </Tab.Navigator>
 
-        </NavigationContainer>
+        // </NavigationContainer>
     );
 };
 
