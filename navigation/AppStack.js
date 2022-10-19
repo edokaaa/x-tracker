@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -61,7 +61,7 @@ const AppStack = () => {
                     backgroundColor: COLORS.white,
                     borderRadius: 15,
                     height: 70,
-                    borderWidth: 0,
+                    ... styles.shadow
                 },
                 tabBarIcon: ({focused, color, size}) => {
                     let iconName;
@@ -96,6 +96,19 @@ const AppStack = () => {
         </Tab.Navigator>
     );
 };
+
+const styles = StyleSheet.create({
+    shadow: {
+        shadowColor: '#7F5DF0',
+        shadowOffset: {
+            width: 0,
+            height: 10,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.5,
+        elevation: 5
+    }
+});
 
 export default AppStack;
 

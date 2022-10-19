@@ -4,7 +4,7 @@ import { Text } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { COLORS, FONTS } from '../constants';
 
-export default function CustomButton({label, onPress,}) {
+export default function CustomButton({label, onPress, justifyContent='center'}) {
     return (
         <TouchableOpacity
             style={{
@@ -14,14 +14,14 @@ export default function CustomButton({label, onPress,}) {
                 borderRadius: 10,
                 marginBottom: 8,
                 flexDirection: 'row',
-                justifyContent: 'center',
+                justifyContent: justifyContent,
             }}
             onPress={onPress}>
             <Text
                 style={{
                     color: COLORS.white,
                     fontSize: 18,
-                    textAlign: 'center',
+                    // textAlign: '',
                     fontWeight: 'bold',
                 }}>
                 {label}

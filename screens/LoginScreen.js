@@ -34,6 +34,7 @@ const LoginScreen = ({navigation}) => {
             <CustomButton
                 label={'Login'}
                 onPress={() => navigation.navigate('Dashboard')}
+                justifyContent={'center'}
                 />
             <TouchableOpacity
                 style={{
