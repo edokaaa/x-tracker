@@ -12,7 +12,7 @@ import RenderHeader from '../components/ScreenHeader';
 // theme
 import { COLORS } from '../constants';
 
-export default function TransactionScreen() {
+export default function TransactionScreen({navigation}) {
     const type = [
         {
             id: 1,
@@ -49,6 +49,7 @@ export default function TransactionScreen() {
                     padding={50}
                     width={'100%'}
                     iconName={item.iconName}
+                    onPress={() => {navigation.navigate('AddTransaction')}}
                     />)}
                 keyExtractor={(item) => `${item.id}`}
             />
