@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 
-export default function RenderNavBar() {
+export default function RenderNavBar({back = () => {}, more = () => {}}) {
     return (
         <View
             style={{
@@ -21,7 +21,7 @@ export default function RenderNavBar() {
         >
             <TouchableOpacity
                 style={{ justifyContent: 'center', width: 50, }}
-                onPress={() => console.log('Go Back')}
+                onPress={back}
             >
                 <Image
                     source={icons.back_arrow}
@@ -35,7 +35,7 @@ export default function RenderNavBar() {
 
             <TouchableOpacity
                 style={{ justifyContent: 'center', alignItems: 'flex-end', width: 50 }}
-                onPress={() => console.log('More')}
+                onPress={more}
             >
                 <Image
                     source={icons.more}
