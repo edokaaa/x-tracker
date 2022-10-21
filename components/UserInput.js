@@ -28,7 +28,6 @@ export default function UserInput({placeholder, iconName, isPassword=false}) {
                     placeholder={placeholder}
                     style={{ ...FONTS.h3, flex: 1, paddingVertical: 0}}
                     secureTextEntry={isPassword ? true : false}
-                    autoFocus={true}
                 />
             </View>
         </View>
