@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
@@ -8,6 +8,12 @@ import LoginSVG from '../assets/images/misc/projections.svg';
 
 
 const OnboardingScreen = ({navigation}) => {
+    useEffect(() => {
+        setTimeout(() => {
+            navigation.navigate("Login");
+        }, 5000);
+    }, []);
+
     return (
         <SafeAreaView
             style={{
@@ -34,28 +40,6 @@ const OnboardingScreen = ({navigation}) => {
                     All your transactions at your finger tips.
                 </Text>
             </View>
-            <TouchableOpacity
-                style={{
-                    backgroundColor: COLORS.secondary,
-                    padding: 20,
-                    width: '90%',
-                    borderRadius: 10,
-                    marginBottom: 30,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                }}
-                onPress={() => navigation.navigate('Login')}>
-                <Text
-                    style={{
-                        color: COLORS.white,
-                        fontSize: 18,
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                    }}>
-                    Login
-                </Text>
-                <MaterialIcons name='arrow-forward-ios' size={22} color={COLORS.white} />
-            </TouchableOpacity>
         </SafeAreaView>
     );
 };
