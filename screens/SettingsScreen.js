@@ -1,14 +1,13 @@
 import React from 'react';
-import {
-    View,
-    Text,
-} from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { View } from 'react-native';
 
-export default function SettingsScreen() {
+import RenderHeader from '../components/ScreenHeader';
+import { COLORS } from '../constants';
+
+export default function CategoryScreen() {
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>SettingsScreen</Text>
+        <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
+            <RenderHeader header={'Settings'} sub={'6 Total'} />
         </View>
     );
 }
