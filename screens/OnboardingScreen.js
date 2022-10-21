@@ -31,7 +31,7 @@ const OnboardingScreen = ({navigation}) => {
                         fontSize: 20,
                         color: COLORS.primary,
                     }}>
-                    Your every transactions at your finger tips.
+                    All your transactions at your finger tips.
                 </Text>
             </View>
             <TouchableOpacity

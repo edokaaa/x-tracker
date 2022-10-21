@@ -1,14 +1,12 @@
 import React from 'react';
-import { Text, View, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView } from 'react-native';
+import { Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, FONTS } from '../constants';
 import LoginSVG from '../assets/images/misc/login.svg';
 
 import CustomButton from '../components/CustomButton';
 import UserInput from '../components/UserInput';
-
-import AppStack from '../navigation/AppStack';
 
 
 const LoginScreen = ({navigation}) => {
