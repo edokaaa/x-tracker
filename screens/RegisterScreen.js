@@ -46,7 +46,7 @@ const RegisterScreen = ({navigation}) => {
             />
             <CustomButton
                 label={'Sign up'}
-                onPress={() => navigation.navigate('Login')}
+                onPress={() => navigation.navigate('Dashboard')}
                 />
             <View
                 style={{
@@ -62,7 +62,7 @@ const RegisterScreen = ({navigation}) => {
                     Have an account?
                 </Text>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('Onboarding')}>
+                    onPress={() => navigation.navigate('Login')}>
                     <MaterialIcons style={{
                         color: COLORS.secondary,
                         fontWeight: 'bold'

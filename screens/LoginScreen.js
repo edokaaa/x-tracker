@@ -33,13 +33,14 @@ const LoginScreen = ({navigation}) => {
                 label={'Login'}
                 onPress={() => navigation.navigate('Dashboard')}
                 justifyContent={'center'}
+                iconName={'login'}
                 />
             <TouchableOpacity
                 style={{
                     justifyContent: 'center',
                     marginBottom: 60,
                 }}
-                onPress={() => navigation.navigate('Onboarding')}>
+                onPress={() => navigation.navigate('Register')}>
                 <Text
                     style={{
                         color: COLORS.secondary,

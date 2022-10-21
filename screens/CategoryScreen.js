@@ -9,7 +9,7 @@ import { COLORS } from '../constants';
 export default function CategoryScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
-            <RenderHeader header={'CATEGORIES'} sub={'6 Total'} />
+            <RenderHeader header={'Categories'} sub={'6 Total'} />
             <CategoryList />
         </View>
     );

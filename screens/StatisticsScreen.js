@@ -229,7 +229,7 @@ const StatisticsScreen = () => {
 
     return (
         <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
-            <RenderHeader header={'STATISTICS'} sub={'Summary'}/>
+            <RenderHeader header={'Statistics'} sub={'Summary'}/>
             <ScrollView contentContainerStyle={{ paddingBottom: 10 }}>
                 <View>
                     {renderChart()}
