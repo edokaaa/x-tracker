@@ -51,16 +51,17 @@ const AppStack = () => {
         <Tab.Navigator
             screenOptions = {({route}) => ({
                 headerShown: false,
-                tabBarShowLabel: false,
                 tabBarStyle: {
                     position: 'absolute',
+                    paddingBottom: 10,
+                    paddingTop: 10,
                     bottom: 25,
                     left: 20,
                     right: 20,
                     elevation: 0,
                     backgroundColor: COLORS.white,
                     borderRadius: 15,
-                    height: 70,
+                    height: 60,
                     ... styles.shadow
                 },
                 tabBarIcon: ({focused, color, size}) => {
