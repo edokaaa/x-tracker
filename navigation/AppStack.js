@@ -8,10 +8,11 @@ import DashboardScreen from '../screens/DashboardScreen';
 import CategoryScreen from '../screens/CategoryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import StatisticsScreen from '../screens/StatisticsScreen';
-import TransactionScreen from '../screens/TransactionScreen';
 
 // Theme
 import { COLORS } from '../constants';
+import TransactionStack from './TransactionStack';
+// import TransactionModel from '../components/TransactionModal';
 
 // Screen Names 
 const homeName = 'Home';
@@ -87,7 +88,7 @@ const AppStack = () => {
             <Tab.Screen name={statsName} component={StatisticsScreen} />
             <Tab.Screen
                 name={addTx}
-                component={TransactionScreen}
+                component={TransactionStack}
                 options={{
                     tabBarButton: (props) => <MiddleBotton {...props} />
                 }} 

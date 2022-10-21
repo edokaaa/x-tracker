@@ -7,19 +7,19 @@ import { COLORS } from '../constants';
 
 
 
-export default TransactionModel = () => {
-    const [modalVisible, setModalVisible] = useState(false);
+export default function TransactionModel() {
+    const [modalVisible, setModalVisible] = useState(true);
     return (
-        <>
-            {/* <Button onPress={() => {setModalVisible(true)}}
-                icon={
-                    <Ionicons 
-                        ame={'add-circle'}
-                        size={23}
-                        color={COLORS.secondary}
-                    />
-                }
-            /> */}
+        // <>
+        //     {/* <Button onPress={() => {setModalVisible(true)}}
+        //         icon={
+        //             <Ionicons 
+        //                 ame={'add-circle'}
+        //                 size={23}
+        //                 color={COLORS.secondary}
+        //             />
+        //         }
+        //     /> */}
             <View>
                 <Modal
                     backdropOpacity={0.3}
@@ -34,7 +34,7 @@ export default TransactionModel = () => {
                     </View>
                 </Modal>
             </View>
-        </>
+        // </>
     );
 }
 const styles = StyleSheet.create({
@@ -62,17 +62,17 @@ const styles = StyleSheet.create({
   }
 });
 
-const getHeaderTitle = (route) => {
-    const routeName =
-      route.state?.routes[route.state.index]?.name ?? INITIAL_ROUTE_NAME;
-    switch (routeName) {
-      case 'Transaction':
-        return 'Transaction';
-      case 'Pay':
-        return 'Payment';
-      case 'Setting':
-        return 'Setting Payment';
-      case 'SetDefault':
-        return 'Set Payment Default';
-    }
-  };
+// const getHeaderTitle = (route) => {
+//     const routeName =
+//       route.state?.routes[route.state.index]?.name ?? INITIAL_ROUTE_NAME;
+//     switch (routeName) {
+//       case 'Transaction':
+//         return 'Transaction';
+//       case 'Pay':
+//         return 'Payment';
+//       case 'Setting':
+//         return 'Setting Payment';
+//       case 'SetDefault':
+//         return 'Set Payment Default';
+//     }
+//   };
