@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import AuthStack from './navigation/AuthStack';
 
@@ -13,13 +12,6 @@ function App() {
         "Roboto-Black": require("./assets/fonts/Roboto-Black.ttf"),
         "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
     });
-
-    useEffect(() => {
-        async function prepare() {
-            await SplashScreen.preventAutoHideAsync();
-        }
-        prepare();
-    })
 
     if (!fontsLoaded) {
         return undefined;
