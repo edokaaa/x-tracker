@@ -5,7 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { COLORS, FONTS } from '../constants';
 
 
-export default function UserInput({placeholder, iconName, isPassword=false}) {
+export default function UserInput({placeholder, iconName, isPassword=false, onChangeText=() => {}}) {
     return (
         <View style={{
             flexDirection: 'row',
@@ -28,6 +28,7 @@ export default function UserInput({placeholder, iconName, isPassword=false}) {
                     placeholder={placeholder}
                     style={{ ...FONTS.h3, flex: 1, paddingVertical: 0}}
                     secureTextEntry={isPassword ? true : false}
+                    onChangeText={onChangeText}
                 />
             </View>
         </View>

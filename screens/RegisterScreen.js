@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, View, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView } from 'react-native';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
@@ -8,13 +8,12 @@ import FlagSVG from '../assets/images/misc/flagged.svg';
 import CustomButton from '../components/CustomButton';
 import UserInput from '../components/UserInput';
 
-let Currencies = [
-    {value: 'NGN'},
-    {value: 'USD'},
-    {value: 'EUR'},
-];
 
 const RegisterScreen = ({navigation}) => {
+    const [userName, setUserName] = useState('');
+    const [password, setPassword] = useState('');
+    const [initialAmount, setInitialAmount] = useState('');
+
     return (
         <SafeAreaView
             style={{
@@ -30,46 +29,23 @@ const RegisterScreen = ({navigation}) => {
             <UserInput 
                 placeholder={'Username'}
                 iconName={'account-circle'}
-                isPassword={true}
+                onChangeText={value => setUserName(value)}
             />
             <UserInput 
                 placeholder={'Enter you password'}
                 iconName={'lock-outline'}
-            />
-            <UserInput 
-                placeholder={'Select Currency'}
-                iconName={'attach-money'}
+                isPassword={true}
+                onChangeText={value => setPassword(value)}
             />
             <UserInput 
                 placeholder={'Initial Balance'}
                 iconName={'money'}
+                onChangeText={value => setInitialAmount(value)}
             />
             <CustomButton
-                label={'Sign up'}
+                label={'Register'}
                 onPress={() => navigation.navigate('Dashboard')}
                 />
-            <View
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                }}
-            >
-                <Text style={{
-                    color: COLORS.primary,
-                    fontWeight: 'bold', 
-                    marginRight: 5
-                }}>
-                    Have an account?
-                </Text>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Login')}>
-                    <MaterialIcons style={{
-                        color: COLORS.secondary,
-                        fontWeight: 'bold'
-                        }}
-                        name='login' size={22}/>
-                </TouchableOpacity>
-            </View>
         </SafeAreaView>
     );
 };
