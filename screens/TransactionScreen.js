@@ -1,58 +1,90 @@
-import React from 'react';
-import {
-    View,
-    FlatList,
-    SafeAreaView,
-} from 'react-native';
+import React, {useEffect, useLayoutEffect, useState} from 'react'
+import {ScrollView, StyleSheet, View} from 'react-native'
+import CustomListItem from '../components/CustomListItem'
+import {Text} from 'react-native-elements'
+import {FontAwesome5} from '@expo/vector-icons'
 
-// components
-import CustomButton from '../components/CustomButton';
+import tx from '../data/Transactions'
+
 import RenderHeader from '../components/ScreenHeader';
-
-// theme
 import { COLORS } from '../constants';
 
-export default function TransactionScreen({navigation}) {
-    const type = [
-        {
-            id: 1,
-            label: "Income",
-            color: COLORS.green,
-            iconName: 'trending-up'
-        },
-        {
-            id: 2,
-            label: "Expense",
-            color: COLORS.secondary,
-            iconName: 'trending-down'
-        },
-    ]
 
-    return (
-        <SafeAreaView style={{
-            padding: 30,
-            flex: 1,
-            height: '100%'
-        }}>
-        <View style={{
-            flex: 1,
-            backgroundColor: COLORS.lightGray2,
-            }}>
-            <RenderHeader header={'Add Transaction'} sub={'Select Transaction Type'} />
+const AllTransactions = ({navigation}) => {
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: 'All Transactions',
+    })
+  }, [])
+
+  const [transactions, setTransactions] = useState([])
+  useEffect(() => {
+
+//     const unsubscribe = db
+//       .collection('expense')
+//       .orderBy('timestamp', 'desc')
+//       .onSnapshot((snapshot) =>
+        setTransactions(tx.transactions);
+//           snapshot.docs.map((doc) => ({
+//             id: doc.id,
+//             data: doc.data(),
+//           }))
+//         )
+//       )
+
+//     return unsubscribe
+  }, [])
+//   const [filter, setFilter] = useState([])
+//   useEffect(() => {
+//     if (transactions) {
+//       setFilter(
+//         transactions.filter(
+//           (transaction) => transaction.data.email === auth.currentUser.email
+//         )
+//       )
+//     }
+//   }, [transactions])
+  return (
+    <>
+    <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
+        <RenderHeader header={'Transactions'} sub={transactions?.length + ' total'} />
+      {transactions?.length > 0 ? (
+          <ScrollView style={styles.container}>
+            {transactions?.map((info) => (
+              <View key={info.id}>
+                <CustomListItem
+                  info={info}
+                  navigation={navigation}
+                  id={info.id}
+                />
+              </View>
+            ))}
+          </ScrollView>
+      ) : (
+        <View style={styles.containerNull}>
+          <FontAwesome5 name='list-alt' size={24} color='#EF8A76' />
+          <Text h4 style={{color: '#4A2D5D'}}>
+            No Transactions
+          </Text>
         </View>
-            <FlatList 
-                style={{padding: 50}}
-                data={type}
-                renderItem={({item}) => (<CustomButton
-                    label={item.label}
-                    backgroundColor={item.color}
-                    padding={50}
-                    width={'100%'}
-                    iconName={item.iconName}
-                    onPress={() => {navigation.navigate('AddTransaction')}}
-                    />)}
-                keyExtractor={(item) => `${item.id}`}
-            />
-        </SafeAreaView>
-    );
+      )}
+    </View>
+    </>
+  )
 }
+
+export default AllTransactions
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    padding: 0,
+    marginTop: -23,
+  },
+  containerNull: {
+    flex: 1,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+})

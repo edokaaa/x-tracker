@@ -5,19 +5,22 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Screens
 import DashboardScreen from '../screens/DashboardScreen';
-import CategoryScreen from '../screens/CategoryScreen';
+// import CategoryScreen from '../screens/CategoryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import StatisticsScreen from '../screens/StatisticsScreen';
+import AllTransactions from '../screens/TransactionScreen';
 
 // Theme
 import { COLORS } from '../constants';
-import TransactionStack from './TransactionStack';
 // import TransactionModel from '../components/TransactionModal';
+
+import AddScreen from '../screens/AddScreen';
 
 // Screen Names 
 const homeName = 'Home';
 const statsName = 'Statistics';
-const categoryName = 'Category';
+// const categoryName = 'Category';
+const transactionsName = 'Transactions';
 const settingsName = 'Settings';
 const addTx = 'Add';
 
@@ -71,10 +74,10 @@ const AppStack = () => {
 
                     if (rn === homeName) {
                         iconName = focused ? 'home' : 'home-outline'
+                    } else if (rn === transactionsName) {
+                        iconName = focused ? 'list' : 'list-outline'
                     } else if (rn === statsName) {
                         iconName = focused ? 'trending-up' : 'trending-up'
-                    } else if (rn === categoryName) {
-                        iconName = focused ? 'list' : 'list-outline'
                     } else if (rn === settingsName) {
                         iconName = focused ? 'settings' : 'settings-outline'
                     }
@@ -84,16 +87,17 @@ const AppStack = () => {
                 tabBarInactiveTintColor: COLORS.darkgray,
             })}
         >
+            {/* <Tab.Screen name={homeName} component={AllTransactions} /> */}
             <Tab.Screen name={homeName} component={DashboardScreen} />
-            <Tab.Screen name={statsName} component={StatisticsScreen} />
+            <Tab.Screen name={transactionsName} component={AllTransactions} />
             <Tab.Screen
                 name={addTx}
-                component={TransactionStack}
+                component={AddScreen}
                 options={{
                     tabBarButton: (props) => <MiddleBotton {...props} />
                 }} 
             />
-            <Tab.Screen name={categoryName} component={CategoryScreen} />
+            <Tab.Screen name={statsName} component={StatisticsScreen} />
             <Tab.Screen name={settingsName} component={SettingsScreen} />
         </Tab.Navigator>
     );

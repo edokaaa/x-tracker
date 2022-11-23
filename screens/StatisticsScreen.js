@@ -24,7 +24,7 @@ import RenderHeader from "../components/ScreenHeader";
 import CategoryHeaderSection from "../components/StatCategoryHeader";
 
 // data
-import categoriesData from "../data/DummyData";
+import categoriesData from "../data/Categories";
 
 
 const StatisticsScreen = () => {
@@ -230,13 +230,25 @@ const StatisticsScreen = () => {
     return (
         <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
             <RenderHeader header={'Statistics'} sub={'Summary'}/>
+            {/* <FlatList 
+            data={()=>{}}
+            renderItem={()=>{
+                renderChart()
+            }}
+            > */}
             <ScrollView contentContainerStyle={{ paddingBottom: 10 }}>
-                <View>
+                {/* <View> */}
                     {renderChart()}
-                    {renderExpenseSummary()}
-                </View>
+                    
+                {/* </View> */}
             </ScrollView>
+            {/* t</FlatList> */}
+            <View>
+                {renderExpenseSummary()}
+            </View>
+            
         </View>
+
     )
 }
 
