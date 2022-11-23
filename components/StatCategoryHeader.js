@@ -9,7 +9,7 @@ import {
 import { COLORS, FONTS, SIZES, icons, images } from '../constants';
 
 // data
-import { categoriesData } from '../data/DummyData'
+import { categoriesData } from '../data/Categories'
 
 
 export default function CategoryHeaderSection() {
