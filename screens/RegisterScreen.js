@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Text, View, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, View, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView, Alert } from 'react-native';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { COLORS, FONTS } from '../constants';
@@ -8,11 +8,30 @@ import FlagSVG from '../assets/images/misc/flagged.svg';
 import CustomButton from '../components/CustomButton';
 import UserInput from '../components/UserInput';
 
+import * as SQLite from 'expo-sqlite';
+import { getUser, createDataBase, createUser } from '../data/Database';
+// import { openDatabase } from 'react-native-sqlite-storage';
+
+// const db = openDatabase({
+//     name: "xtracker",
+// });
+const db = SQLite.openDatabase(
+    {
+        name: 'MainDB',
+        location: 'default',
+    },
+    () => { },
+    error => { console.log(error) }
+);
 
 const RegisterScreen = ({navigation}) => {
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [initialAmount, setInitialAmount] = useState('');
+
+    createDataBase();
+    const user = getUser();
+    console.log(user);
 
     return (
         <SafeAreaView
@@ -44,7 +63,11 @@ const RegisterScreen = ({navigation}) => {
             />
             <CustomButton
                 label={'Register'}
-                onPress={() => navigation.navigate('Dashboard')}
+                // onPress={() => navigation.navigate('Dashboard')}
+                onPress={(userName, password) => {
+                    createUser(userName, password);
+                    navigation.navigate("Login");
+                }}
                 />
         </SafeAreaView>
     );
