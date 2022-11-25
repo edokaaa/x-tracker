@@ -11,34 +11,17 @@ import tx from '../data/Transactions'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { COLORS, FONTS } from '../constants';
+import { ScrollView } from 'react-native-gesture-handler'
 
 
 
 const HomeScreen = ({navigation}) => {
-  const signOutUser = () => {
-    // auth
-    //   .signOut()
-    //   .then(() => navigation.replace('Login'))
-    //   .catch((error) => alert(error.message))
-    alert("User Signed out")
-  }
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: 'Expense Tracker',
-      headerRight: () => (
-        <View style={{marginRight: 20}}>
-          <TouchableOpacity activeOpacity={0.5} onPress={signOutUser}>
-            <Text style={{fontWeight: 'bold'}}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      ),
-    })
-  }, [navigation])
 
   // transactions
   const [transactions, setTransactions] = useState([])
   useEffect(() => {
-    setTransactions(tx.transactions);
+    // setTransactions(tx.transactions);
+    setTransactions([]);
     setTotalIncome(tx.transactions.map((item) => {
         item?.type == 'income'
         ? 1000
@@ -127,7 +110,6 @@ const HomeScreen = ({navigation}) => {
   return (
     <>
       <SafeAreaView style={styles.container}>
-        <StatusBar style='dark' />
         <View style={styles.fullName}>
           {/* <Avatar
             size='medium'
@@ -137,47 +119,48 @@ const HomeScreen = ({navigation}) => {
             }}
           /> */}
           <View style={{marginLeft: 10}}>
-            <Text style={{fontWeight: 'bold', ...FONTS.h3}}>Welcome</Text>
+            <Text style={{...FONTS.body1}}>Welcome,</Text>
             <Text style={{...FONTS.largeTitle}}>
               {/* {auth.currentUser.displayName} */}
-              {"edoka!"}
+              {"edoka"}
             </Text>
           </View>
         </View>
         <View style={styles.card}>
           <View style={styles.cardTop}>
-            <Text style={{textAlign: 'center', color: 'aliceblue'}}>
+            <Text style={{textAlign: 'center', color: COLORS.white, ...FONTS.body2}}>
               Total Balance
             </Text>
-            <Text h3 style={{textAlign: 'center', color: 'aliceblue'}}>
+            <Text h3 style={{textAlign: 'center', color: COLORS.white, ...FONTS.h1}}>
               $ {totalBalance.toFixed(2)}
             </Text>
           </View>
           <View style={styles.cardBottom}>
             <View>
               <View style={styles.cardBottomSame}>
-                <Feather name='arrow-down' size={18} color='green' />
+                <Feather name='arrow-down' size={24} color={COLORS.green} />
                 <Text
                   style={{
                     textAlign: 'center',
                     marginLeft: 5,
+                    ...FONTS.body2
                   }}
                 >
                   Income
                 </Text>
               </View>
-              <Text h4 style={{textAlign: 'center'}}>
+              <Text style={{textAlign: 'center', ...FONTS.h2}}>
                 {`$ ${income?.toFixed(2)}`}
               </Text>
             </View>
             <View>
               <View style={styles.cardBottomSame}>
-                <Feather name='arrow-up' size={18} color='red' />
+                <Feather name='arrow-up' size={24} color='red' />
                 <Text style={{textAlign: 'center', marginLeft: 5}}>
                   Expense
                 </Text>
               </View>
-              <Text h4 style={{textAlign: 'center'}}>
+              <Text style={{textAlign: 'center', ...FONTS.h2}}>
                 {`$ ${expense?.toFixed(2)}`}
               </Text>
             </View>
@@ -195,7 +178,6 @@ const HomeScreen = ({navigation}) => {
             <Text style={styles.seeAll}>See All</Text>
           </TouchableOpacity>
         </View>
-
         {transactions?.length > 0 ? (
           <View style={styles.recentTransactions}>
             {transactions?.slice(0, 3).map((info) => (
@@ -210,34 +192,13 @@ const HomeScreen = ({navigation}) => {
           </View>
         ) : (
           <View style={styles.containerNull}>
-            <FontAwesome5 name='list-alt' size={24} color='#EF8A76' />
-            <Text h4 style={{color: '#4A2D5D'}}>
+            <FontAwesome5 name='list-alt' size={24} color={COLORS.secondary} />
+            <Text style={{color: COLORS.primary, ...FONTS.body2}}>
               No Transactions
             </Text>
           </View>
         )}
       {/* </View> */}
-      <View style={styles.addButton}>
-        <TouchableOpacity
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Home')}
-        >
-          <AntDesign name='home' size={24} color='#66AFBB' />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.plusButton}
-          onPress={() => navigation.navigate('Add')}
-          activeOpacity={0.5}
-        >
-          <AntDesign name='plus' size={24} color='white' />
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('All')}
-        >
-          <FontAwesome5 name='list-alt' size={24} color='#EF8A76' />
-        </TouchableOpacity>
-      </View>
       </SafeAreaView>
     </>
   )
@@ -257,11 +218,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   card: {
-    backgroundColor: '#535F93',
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
     width: '100%',
-    padding: 10,
-    borderRadius: 10,
+    padding: 20,
+    borderRadius: 20,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.23,
@@ -278,8 +239,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     width: '100%',
     margin: 'auto',
-    backgroundColor: '#E0D1EA',
-    borderRadius: 5,
+    backgroundColor: COLORS.white,
+    borderRadius: 10,
+    padding: 10,
   },
   cardBottomSame: {
     flexDirection: 'row',
@@ -320,22 +282,9 @@ const styles = StyleSheet.create({
 
     elevation: 24,
   },
-  plusButton: {
-    backgroundColor: '#535F93',
-    padding: 10,
-    borderRadius: 50,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 12,
-    },
-    shadowOpacity: 0.58,
-    shadowRadius: 16.0,
-    elevation: 24,
-  },
   containerNull: {
     alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 50,
     flex: 1,
     width: '100%',
   },
