@@ -6,14 +6,14 @@ import ModalActions from './ModalActions'
 
 import moment from 'moment'
 
-const CustomListItem = ({info, navigation, id}) => {
+const CustomListItem = ({transaction, navigation, id}) => {
   const [modalVisible, setModalVisible] = useState(false)
 
   return (
     <>
       <View>
         <ListItem onPress={() => setModalVisible(true)}>
-          {info.type === 'expense' ? (
+          {transaction?.type_id === 2 ? (
             <View style={styles.left}>
               <MaterialIcons name='money-off' size={24} color='white' />
             </View>
@@ -26,22 +26,22 @@ const CustomListItem = ({info, navigation, id}) => {
             <ListItem.Title
               style={{fontWeight: 'bold', textTransform: 'capitalize'}}
             >
-              {info?.text}
+              {transaction?.description}
             </ListItem.Title>
             <ListItem.Subtitle>
-              {/* {new Date(info?.timestamp?.toDate()).toUTCString()} */}
-              {moment(info?.addedtime, "x").format("DD MMM YYYY")}
-              {/* {info?.timestamp} */}
+              {/* {new Date(transaction?.timestamp?.toDate()).toUTCString()} */}
+              {moment(transaction?.addedtime, "x").format("DD MMM YYYY")}
+              {/* {transaction?.timestamp} */}
             </ListItem.Subtitle>
           </ListItem.Content>
           <View>
-            {info.type === 'expense' ? (
+            {transaction?.type_id === 1 ? (
               <Text style={styles.right}>
-                - ${Number(info?.price)?.toFixed(2)}
+                - ${Number(transaction?.price)?.toFixed(2)}
               </Text>
             ) : (
               <Text style={styles.rightIncome}>
-                ${Number(info?.price)?.toFixed(2)}
+                ${Number(transaction?.price)?.toFixed(2)}
               </Text>
             )}
           </View>
