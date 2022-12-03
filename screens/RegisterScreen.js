@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView, Alert } from 'react-native';
 
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { COLORS, FONTS } from '../constants';
 import FlagSVG from '../assets/images/misc/flagged.svg';
 
@@ -9,33 +8,49 @@ import CustomButton from '../components/CustomButton';
 import UserInput from '../components/UserInput';
 
 import * as SQLite from 'expo-sqlite';
-import { getUser, createDataBase, createUser } from '../data/Database';
-// import { openDatabase } from 'react-native-sqlite-storage';
+import { ScrollView } from 'react-native-gesture-handler';
 
-// const db = openDatabase({
-//     name: "xtracker",
-// });
-const db = SQLite.openDatabase(
-    {
-        name: 'MainDB',
-        location: 'default',
-    },
-    () => { },
-    error => { console.log(error) }
-);
 
 const RegisterScreen = ({navigation}) => {
-    const [userName, setUserName] = useState('');
-    const [password, setPassword] = useState('');
-    const [initialAmount, setInitialAmount] = useState('');
+    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
 
-    createDataBase();
-    const user = getUser();
-    console.log(user);
+    const [userName, setUserName] = useState(undefined);
+    const [password, setPassword1] = useState(undefined);
+    const [password2, setPassword2] = useState(undefined);
+
+    useEffect(() => {
+        db.transaction(tx => {
+            tx.executeSql('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)')
+        });
+    }, [db]);
+
+    const validatePassword = () => {
+        if (password !== password2) {
+            Alert.alert('Passwords mismatched!');
+        }
+    }
+
+    const registerUser = () => {
+        if (userName === undefined || password === undefined) {
+            Alert.alert('invalid details');
+        } else {
+            db.transaction(tx => {
+                tx.executeSql('INSERT INTO users (username, password) values (?, ?)', [userName, password],
+                    (txobj, resultSet) => {
+                        if (resultSet.rowsAffected > 0) {
+                            Alert.alert('Registeration Successful!');
+                            navigation.navigate("Dashboard");
+                        }
+                    },
+                    (txObj, error) => console.log(error)
+                );
+            });
+        }
+    }
 
     return (
-        <SafeAreaView
-            style={{
+        <ScrollView
+            contentContainerStyle={{
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -51,25 +66,25 @@ const RegisterScreen = ({navigation}) => {
                 onChangeText={value => setUserName(value)}
             />
             <UserInput 
-                placeholder={'Enter you password'}
+                placeholder={'Enter a password'}
                 iconName={'lock-outline'}
                 isPassword={true}
-                onChangeText={value => setPassword(value)}
+                onChangeText={value => setPassword1(value)}
             />
             <UserInput 
-                placeholder={'Initial Balance'}
-                iconName={'money'}
-                onChangeText={value => setInitialAmount(value)}
+                placeholder={'Confirm password'}
+                iconName={'lock-outline'}
+                isPassword={true}
+                onChangeText={(value) => {
+                    setPassword2(value);
+                }}
+                onEndEditing={() => validatePassword()}
             />
             <CustomButton
                 label={'Register'}
-                // onPress={() => navigation.navigate('Dashboard')}
-                onPress={(userName, password) => {
-                    createUser(userName, password);
-                    navigation.navigate("Login");
-                }}
+                onPress={() => {registerUser()}}
                 />
-        </SafeAreaView>
+        </ScrollView>
     );
 };
 

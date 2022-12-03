@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, FONTS } from '../constants';
@@ -8,8 +8,58 @@ import LoginSVG from '../assets/images/misc/login.svg';
 import CustomButton from '../components/CustomButton';
 import UserInput from '../components/UserInput';
 
+import * as SQLite from 'expo-sqlite';
+import tx from '../data/Transactions';
+
 
 const LoginScreen = ({navigation}) => {
+    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
+    const [currentUser, setCurrentUser] = useState(undefined);
+    const [isLoading, setIsLoading] = useState(true);
+    const [password, setPassword] = useState(undefined);
+
+    useEffect(() => {
+        db.transaction(tx => {
+            tx.executeSql('SELECT * From users', null,
+                (txObj, resultSet) => {
+                    if (resultSet.rows._array.length < 1) {
+                        navigation.navigate("Register");
+                    } else {
+                        console.log(resultSet.rows._array);
+                        setCurrentUser(resultSet.rows._array[0]);
+                        setIsLoading(false);
+                    }
+                },
+                (txObj, error) => console.log(error)
+            );
+        });
+    }, [db]);
+
+    const loginUser = () => {
+        db.transaction(tx => {
+            tx.executeSql('SELECT * FROM users WHERE username=? AND password=?', [currentUser.username, password],
+                (txObj, resultSet) => {
+                    if (resultSet.rows._array.length !== 1) {
+                        // password incorrect
+                        Alert.alert('Incorrect Password');
+                    } else {
+                        navigation.navigate('Dashboard')
+                    }
+                },
+                (txObj, error) => console.log(error)
+            );
+        });
+    }
+
+    if (isLoading) {
+        return (
+          <View style={styles.container}>
+            <Text>Please wait...</Text>
+          </View>
+        );
+      }
+
+
     return (
         <SafeAreaView
             style={{
@@ -22,16 +72,17 @@ const LoginScreen = ({navigation}) => {
             <LoginSVG height={175} width={175} />
             <View style={{ alignItems: 'center', marginBottom: 10}}>
                 <Text style={{ ...FONTS.h2, color: COLORS.primary, marginBottom: 5 }}>Welcome back</Text>
-                <Text style={{ ...FONTS.largeTitle, color: COLORS.primary }}>@edoka</Text>
+                <Text style={{ ...FONTS.largeTitle, color: COLORS.primary }}>@{currentUser.username}</Text>
             </View>
             <UserInput 
                 placeholder={'Enter you password'}
                 iconName={'lock-outline'}
                 isPassword={true}
+                onChangeText={value => setPassword(value)}
             />
             <CustomButton
                 label={'Login'}
-                onPress={() => navigation.navigate('Dashboard')}
+                onPress={() => loginUser()}
                 justifyContent={'center'}
                 iconName={'login'}
                 />
@@ -40,7 +91,7 @@ const LoginScreen = ({navigation}) => {
                     justifyContent: 'center',
                     marginBottom: 60,
                 }}
-                onPress={() => navigation.navigate('Register')}>
+                onPress={() => {}}>
                 <Text
                     style={{
                         color: COLORS.secondary,
@@ -62,7 +113,7 @@ const LoginScreen = ({navigation}) => {
                     fontWeight: 'bold', 
                     marginRight: 5
                 }}>
-                    Not edoka?
+                    Not @{currentUser.username}?
                 </Text>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('Register')}>
@@ -76,5 +127,22 @@ const LoginScreen = ({navigation}) => {
         </SafeAreaView>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'stretch',
+      justifyContent: 'space-between',
+      margin: 8
+    }
+  });
+  
 
 export default LoginScreen;

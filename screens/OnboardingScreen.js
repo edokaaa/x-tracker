@@ -10,7 +10,7 @@ import LoginSVG from '../assets/images/misc/projections.svg';
 const OnboardingScreen = ({navigation}) => {
     useEffect(() => {
         setTimeout(() => {
-            navigation.navigate("Register");
+            navigation.navigate("Login");
         }, 5000);
     }, []);
 
