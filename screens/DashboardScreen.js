@@ -13,99 +13,84 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { COLORS, FONTS } from '../constants';
 import { ScrollView } from 'react-native-gesture-handler'
 
+import * as SQLite from 'expo-sqlite';
 
 
 const HomeScreen = ({navigation}) => {
+    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
+    const [transactions, setTransactions] = useState([]);
+    const [user, setUser] = useState(undefined);
+    const [totalIncome, setTotalIncome] = useState(undefined)
+    const [totalExpense, setTotalExpense] = useState(undefined)
+    const [totalBalance, setTotalBalance] = useState(undefined)
+  
+    db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false, () =>
+        console.log('Foreign keys turned on')
+    );
 
-  // transactions
-  const [transactions, setTransactions] = useState([])
-  useEffect(() => {
-    // setTransactions(tx.transactions);
-    setTransactions([]);
-    setTotalIncome(tx.transactions.map((item) => {
-        item?.type == 'income'
-        ? 1000
-        : 0
-    }));
-    setTotalExpense(tx.transactions.map((item) => {
-        item?.type == 'expense'
-        ? 500
-        : 0
-    }));
+    // total
+    const getTypeTotal = (typeId) => {
+        let sum = 0;
+        let filtered = [...transactions].filter(tx => tx.type_id === typeId);
     
-    // const unsubscribe = db
-    //   .collection('expense')
-    //   .orderBy('timestamp', 'desc')
-    //   .onSnapshot(
-    //     (snapshot) =>
-    //       setTransactions(
-    //         snapshot.docs.map((doc) => ({
-    //           id: doc.id,
-    //           data: doc.data(),
-    //         }))
-    //       ) &
-    //       setTotalIncome(
-    //         snapshot.docs.map((doc) =>
-    //           doc.data()?.email === auth.currentUser.email &&
-    //           doc.data()?.type == 'income'
-    //             ? doc.data().price
-    //             : 0
-    //         )
-    //       ) &
-    //       setTotalExpense(
-    //         snapshot.docs.map((doc) =>
-    //           doc.data()?.email === auth.currentUser.email &&
-    //           doc.data()?.type == 'expense'
-    //             ? doc.data().price
-    //             : 0
-    //         )
-    //       )
-    //   )
-
-    // return unsubscribe
-  }, [])
-
-  // stufff
-  const [totalIncome, setTotalIncome] = useState([])
-  const [income, setIncome] = useState(0)
-  const [totalExpense, setTotalExpense] = useState([])
-  const [expense, setExpense] = useState(0)
-  const [totalBalance, setTotalBalance] = useState(0)
+        for (let tx = 0; tx < filtered.length; tx++) {
+            sum = sum + filtered[tx].price
+        }
+        return sum;
+    }
+    
   useEffect(() => {
-    if (totalIncome) {
-      if (totalIncome?.length == 0) {
-        setIncome(0)
-      } else {
-        setIncome(totalIncome?.reduce((a, b) => Number(a) + Number(b), 0))
-      }
-    }
-    if (totalExpense) {
-      if (totalExpense?.length == 0) {
-        setExpense(0)
-      } else {
-        setExpense(totalExpense?.reduce((a, b) => Number(a) + Number(b), 0))
-      }
-    }
-  }, [totalIncome, totalExpense, income, expense])
+    // get user
+    db.transaction(tx => {
+        tx.executeSql('SELECT * FROM users', null,
+        (txObj, resultSet) => {
+            setUser(resultSet.rows._array[0]);
+        },
+        (txObj, error) => console.log(error));
+    });
+
+    // Transaction Type table
+    db.transaction(tx => {
+        tx.executeSql('CREATE TABLE IF NOT EXISTS tx_types (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
+    });
+    db.transaction(tx => {
+        tx.executeSql('INSERT INTO tx_types (name) values (?)', ['income']);
+    });
+    db.transaction(tx => {
+        tx.executeSql('INSERT INTO tx_types (name) values (?)', ['expense']);
+    });
+    // Categorties Table
+    // db.transaction(tx => {
+    //     tx.executeSql('CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
+    // });
+    
+    // Transactions table
+    db.transaction(tx => {
+        tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER, price INTEGER, addedtime INTEGER)')
+    })
+
+    // get all transactions
+    db.transaction(tx => {
+        tx.executeSql('SELECT * FROM transactions', null,
+            (txObj, resultSet) => {
+                setTransactions(resultSet.rows._array);
+                console.log(transactions);
+            },
+            (txObj, error) => console.log(error)
+        );
+    })
+
+    setTotalIncome(getTypeTotal(1));
+    setTotalExpense(getTypeTotal(2));
+  }, [db])
 
   useEffect(() => {
-    if (income || expense) {
-      setTotalBalance(income - expense)
+    if (totalIncome || totalExpense) {
+      setTotalBalance(totalIncome - totalExpense)
     } else {
       setTotalBalance(0)
     }
-  }, [totalIncome, totalExpense, income, expense])
-
-//   const [filter, setFilter] = useState([])
-//   useEffect(() => {
-//     if (transactions) {
-//       setFilter(
-//         transactions.filter(
-//           (transaction) => transaction.data.email === auth.currentUser.email
-//         )
-//       )
-//     }
-//   }, [transactions])
+  }, [totalIncome, totalExpense])
 
   return (
     <>
@@ -121,8 +106,7 @@ const HomeScreen = ({navigation}) => {
           <View style={{marginLeft: 10}}>
             <Text style={{...FONTS.body1}}>Welcome,</Text>
             <Text style={{...FONTS.largeTitle}}>
-              {/* {auth.currentUser.displayName} */}
-              {"edoka"}
+              {user?.username}
             </Text>
           </View>
         </View>
@@ -132,7 +116,7 @@ const HomeScreen = ({navigation}) => {
               Total Balance
             </Text>
             <Text h3 style={{textAlign: 'center', color: COLORS.white, ...FONTS.h1}}>
-              $ {totalBalance.toFixed(2)}
+              $ {totalBalance?.toFixed(2)}
             </Text>
           </View>
           <View style={styles.cardBottom}>
@@ -150,7 +134,7 @@ const HomeScreen = ({navigation}) => {
                 </Text>
               </View>
               <Text style={{textAlign: 'center', ...FONTS.h2}}>
-                {`$ ${income?.toFixed(2)}`}
+                {`$ ${totalIncome?.toFixed(2)}`}
               </Text>
             </View>
             <View>
@@ -161,7 +145,7 @@ const HomeScreen = ({navigation}) => {
                 </Text>
               </View>
               <Text style={{textAlign: 'center', ...FONTS.h2}}>
-                {`$ ${expense?.toFixed(2)}`}
+                {`$ ${totalExpense?.toFixed(2)}`}
               </Text>
             </View>
           </View>
@@ -180,12 +164,12 @@ const HomeScreen = ({navigation}) => {
         </View>
         {transactions?.length > 0 ? (
           <View style={styles.recentTransactions}>
-            {transactions?.slice(0, 3).map((info) => (
-              <View key={info.id}>
+            {transactions?.slice(0, 3).map((transaction) => (
+              <View key={transaction.id}>
                 <CustomListItem
-                  info={info}
+                  transaction={transaction}
                   navigation={navigation}
-                  id={info.id}
+                  id={transaction.id}
                 />
               </View>
             ))}

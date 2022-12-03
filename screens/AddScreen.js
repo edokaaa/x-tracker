@@ -1,5 +1,5 @@
 import {StatusBar} from 'expo-status-bar'
-import React, {useLayoutEffect, useState} from 'react'
+import React, {useEffect, useLayoutEffect, useState} from 'react'
 import {StyleSheet, View, KeyboardAvoidingView, TextInput} from 'react-native'
 import {Text, Button} from 'react-native-elements'
 import DateTimePicker from '@react-native-community/datetimepicker'
@@ -11,39 +11,40 @@ import { COLORS, FONTS } from '../constants';
 import { ScrollView } from 'react-native-gesture-handler'
 
 import CustomButton from '../components/CustomButton'
+import * as SQLite from 'expo-sqlite';
 
 
 // import {db, auth} from '../firebase'
 // import firebase from 'firebase'
 
 const AddScreen = ({navigation}) => {
-  const [submitLoading, setSubmitLoading] = useState(false)
+    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
+    // const [submitLoading, setSubmitLoading] = useState(false);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Add Expense',
     })
   }, [navigation])
+
   const [input, setInput] = useState('')
   const [amount, setAmount] = useState('')
+
   const createTX = () => {
-    if (input && amount && selDate && selectedLanguage) {
-      setSubmitLoading(true)
-      alert("Transaction added!!!")
-//       db.collection('expense')
-//         .add({
-//           email: auth.currentUser.email,
-//           text: input,
-//           price: amount,
-//           date: selDate,
-//           type: selectedLanguage,
-//           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-//           userDate: result,
-//         })
-//         .then(() => clearInputFields())
-//         .catch((error) => alert(error.message))
+    if (input && amount && selDate && selectedType) {
+    //   setSubmitLoading(true);
+        db.transaction(tx => {
+            tx.executeSql('INSERT INTO transactions (description, type_id, price, addedtime) values (?, ?, ?, ?)',
+            [input, 1, amount, result],
+            (txObj, resultSet) => {
+                clearInputFields();
+                navigation.navigate('Transactions');
+            },
+            (txObj, error) => console.log(error));
+        });
     } else {
       alert('All fields are mandatory')
-      setSubmitLoading(false)
+    //   setSubmitLoading(false)
     }
   }
 
@@ -52,9 +53,9 @@ const AddScreen = ({navigation}) => {
     setInput('')
     setAmount('')
     setSelDate(new Date())
-    setSelectedLanguage('expense')
+    setSelectedType('expense')
     navigation.navigate('Home')
-    setSubmitLoading(false)
+    // setSubmitLoading(false)
   }
   // Date Picker
   const [selDate, setSelDate] = useState(new Date())
@@ -75,7 +76,7 @@ const AddScreen = ({navigation}) => {
   const result = format(selDate, 'dd/MM/yyyy')
 
   // Select Dropdown
-  const [selectedLanguage, setSelectedLanguage] = useState('expense')
+  const [selectedType, setSelectedType] = useState('expense')
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
@@ -86,9 +87,9 @@ const AddScreen = ({navigation}) => {
       <View style={styles.inputContainer}>
       <Picker
         style={{height: 100, marginBottom: 30}} itemStyle={{height: 150}}
-          selectedValue={selectedLanguage}
+          selectedValue={selectedType}
           onValueChange={(itemValue, itemIndex) =>
-            setSelectedLanguage(itemValue)
+            setSelectedType(itemValue)
           }
         >
           <Picker.Item label='Expense' value='expense' />

@@ -9,7 +9,6 @@ import CustomButton from '../components/CustomButton';
 import UserInput from '../components/UserInput';
 
 import * as SQLite from 'expo-sqlite';
-import tx from '../data/Transactions';
 
 
 const LoginScreen = ({navigation}) => {
@@ -25,7 +24,6 @@ const LoginScreen = ({navigation}) => {
                     if (resultSet.rows._array.length < 1) {
                         navigation.navigate("Register");
                     } else {
-                        console.log(resultSet.rows._array);
                         setCurrentUser(resultSet.rows._array[0]);
                         setIsLoading(false);
                     }
@@ -49,6 +47,10 @@ const LoginScreen = ({navigation}) => {
                 (txObj, error) => console.log(error)
             );
         });
+    }
+
+    const resetPassword = () => {
+        // password would be sent to user's email
     }
 
     if (isLoading) {
@@ -91,7 +93,7 @@ const LoginScreen = ({navigation}) => {
                     justifyContent: 'center',
                     marginBottom: 60,
                 }}
-                onPress={() => {}}>
+                onPress={() => resetPassword()}>
                 <Text
                     style={{
                         color: COLORS.secondary,
@@ -102,28 +104,6 @@ const LoginScreen = ({navigation}) => {
                     Forgot password?
                 </Text>
             </TouchableOpacity>
-            <View
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                }}
-            >
-                <Text style={{
-                    color: COLORS.primary,
-                    fontWeight: 'bold', 
-                    marginRight: 5
-                }}>
-                    Not @{currentUser.username}?
-                </Text>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Register')}>
-                    <MaterialIcons style={{
-                        color: COLORS.secondary,
-                        fontWeight: 'bold'
-                        }}
-                        name='logout' size={22}/>
-                </TouchableOpacity>
-            </View>
         </SafeAreaView>
     );
 };

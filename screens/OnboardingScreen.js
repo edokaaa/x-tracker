@@ -1,9 +1,6 @@
 import React, {useEffect} from 'react';
 import { Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-
-
-import { COLORS, FONTS, SIZES } from '../constants';
+import { COLORS} from '../constants';
 import LoginSVG from '../assets/images/misc/projections.svg';
 
 

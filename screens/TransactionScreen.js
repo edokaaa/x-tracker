@@ -4,58 +4,49 @@ import CustomListItem from '../components/CustomListItem'
 import {Text} from 'react-native-elements'
 import {FontAwesome5} from '@expo/vector-icons'
 
-import tx from '../data/Transactions'
-
 import RenderHeader from '../components/ScreenHeader';
 import { COLORS } from '../constants';
 
+import * as SQLite from 'expo-sqlite';
+
+
 
 const AllTransactions = ({navigation}) => {
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'All Transactions',
     })
   }, [])
 
-  const [transactions, setTransactions] = useState([])
+
+  const [transactions, setTransactions] = useState([]);
+    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
   useEffect(() => {
 
-//     const unsubscribe = db
-//       .collection('expense')
-//       .orderBy('timestamp', 'desc')
-//       .onSnapshot((snapshot) =>
-        setTransactions(tx.transactions);
-//           snapshot.docs.map((doc) => ({
-//             id: doc.id,
-//             data: doc.data(),
-//           }))
-//         )
-//       )
-
-//     return unsubscribe
-  }, [])
-//   const [filter, setFilter] = useState([])
-//   useEffect(() => {
-//     if (transactions) {
-//       setFilter(
-//         transactions.filter(
-//           (transaction) => transaction.data.email === auth.currentUser.email
-//         )
-//       )
-//     }
-//   }, [transactions])
+    // get all transactions
+    db.transaction(tx => {
+        tx.executeSql('SELECT * FROM transactions', null,
+            (txObj, resultSet) => {
+                setTransactions(resultSet.rows._array);
+                console.log(transactions);
+            },
+            (txObj, error) => console.log(error)
+        );
+    })
+  }, [db])
   return (
     <>
     <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
         <RenderHeader header={'Transactions'} sub={transactions?.length + ' total'} />
       {transactions?.length > 0 ? (
           <ScrollView style={styles.container}>
-            {transactions?.map((info) => (
-              <View key={info.id}>
+            {transactions?.map((transaction) => (
+              <View key={transaction.id}>
                 <CustomListItem
-                  info={info}
+                  transaction={transaction}
                   navigation={navigation}
-                  id={info.id}
+                  id={transaction.id}
                 />
               </View>
             ))}
