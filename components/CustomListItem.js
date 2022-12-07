@@ -35,7 +35,7 @@ const CustomListItem = ({transaction, navigation, id}) => {
             </ListItem.Subtitle>
           </ListItem.Content>
           <View>
-            {transaction?.type_id === 1 ? (
+            {transaction?.type_id === 2 ? (
               <Text style={styles.right}>
                 - ${Number(transaction?.price)?.toFixed(2)}
               </Text>

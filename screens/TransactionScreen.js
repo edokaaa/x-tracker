@@ -34,14 +34,15 @@ const AllTransactions = ({navigation}) => {
             (txObj, error) => console.log(error)
         );
     })
-  }, [db])
+  }, [transactions]);
+
   return (
     <>
     <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
         <RenderHeader header={'Transactions'} sub={transactions?.length + ' total'} />
       {transactions?.length > 0 ? (
           <ScrollView style={styles.container}>
-            {transactions?.map((transaction) => (
+            {transactions?.sort((a, b)=> b.id - a.id).map((transaction) => (
               <View key={transaction.id}>
                 <CustomListItem
                   transaction={transaction}

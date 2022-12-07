@@ -20,13 +20,13 @@ const HomeScreen = ({navigation}) => {
     const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
     const [transactions, setTransactions] = useState([]);
     const [user, setUser] = useState(undefined);
-    const [totalIncome, setTotalIncome] = useState(undefined)
-    const [totalExpense, setTotalExpense] = useState(undefined)
-    const [totalBalance, setTotalBalance] = useState(undefined)
+    const [totalIncome, setTotalIncome] = useState(0);
+    const [totalExpense, setTotalExpense] = useState(0);
+    const [totalBalance, setTotalBalance] = useState(0);
+
+    const [txTypeLenght, setTxTypeLength] = useState(0);
   
-    db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false, () =>
-        console.log('Foreign keys turned on')
-    );
+    db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false, () => {});
 
     // total
     const getTypeTotal = (typeId) => {
@@ -36,8 +36,25 @@ const HomeScreen = ({navigation}) => {
         for (let tx = 0; tx < filtered.length; tx++) {
             sum = sum + filtered[tx].price
         }
+        console.log(sum)
         return sum;
     }
+    useEffect(() => {
+        // get all transactions
+        db.transaction(tx => {
+            tx.executeSql('SELECT * FROM transactions', null,
+                (txObj, resultSet) => {
+                    setTransactions(resultSet.rows._array);
+                },
+                (txObj, error) => console.log(error)
+            );
+        });
+        setTotalIncome(getTypeTotal(1));
+        setTotalExpense(getTypeTotal(2));
+        setTotalBalance(totalIncome - totalExpense);
+    }, [transactions]);
+    
+    
     
   useEffect(() => {
     // get user
@@ -49,48 +66,34 @@ const HomeScreen = ({navigation}) => {
         (txObj, error) => console.log(error));
     });
 
-    // Transaction Type table
-    db.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS tx_types (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
-    });
-    db.transaction(tx => {
-        tx.executeSql('INSERT INTO tx_types (name) values (?)', ['income']);
-    });
-    db.transaction(tx => {
-        tx.executeSql('INSERT INTO tx_types (name) values (?)', ['expense']);
-    });
-    // Categorties Table
-    // db.transaction(tx => {
-    //     tx.executeSql('CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
-    // });
-    
     // Transactions table
     db.transaction(tx => {
         tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER, price INTEGER, addedtime INTEGER)')
     })
 
-    // get all transactions
+    // Transaction Type table
     db.transaction(tx => {
-        tx.executeSql('SELECT * FROM transactions', null,
+        tx.executeSql('CREATE TABLE IF NOT EXISTS tx_types (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
+    });
+    db.transaction(tx => {
+        tx.executeSql('SELECT * FROM tx_types', null,
             (txObj, resultSet) => {
-                setTransactions(resultSet.rows._array);
-                console.log(transactions);
+                setTxTypeLength(resultSet.rows._array.length);
+                console.log(resultSet.rows._array);
             },
             (txObj, error) => console.log(error)
         );
     })
-
-    setTotalIncome(getTypeTotal(1));
-    setTotalExpense(getTypeTotal(2));
-  }, [db])
-
-  useEffect(() => {
-    if (totalIncome || totalExpense) {
-      setTotalBalance(totalIncome - totalExpense)
-    } else {
-      setTotalBalance(0)
+    if (txTypeLenght === 0) {
+        db.transaction(tx => {
+            tx.executeSql('INSERT INTO tx_types (name) values (?)', ['income']);
+        });
+        db.transaction(tx => {
+            tx.executeSql('INSERT INTO tx_types (name) values (?)', ['expense']);
+        });
     }
-  }, [totalIncome, totalExpense])
+}, []);
+
 
   return (
     <>
@@ -164,7 +167,7 @@ const HomeScreen = ({navigation}) => {
         </View>
         {transactions?.length > 0 ? (
           <View style={styles.recentTransactions}>
-            {transactions?.slice(0, 3).map((transaction) => (
+            {transactions?.slice(-3).sort((a, b)=> b.id - a.id).map((transaction) => (
               <View key={transaction.id}>
                 <CustomListItem
                   transaction={transaction}

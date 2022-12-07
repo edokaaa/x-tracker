@@ -38,7 +38,7 @@ const AddScreen = ({navigation}) => {
             [input, 1, amount, result],
             (txObj, resultSet) => {
                 clearInputFields();
-                navigation.navigate('Transactions');
+                navigation.navigate('Home');
             },
             (txObj, error) => console.log(error));
         });
