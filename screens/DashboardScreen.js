@@ -36,7 +36,7 @@ const HomeScreen = ({navigation}) => {
         for (let tx = 0; tx < filtered.length; tx++) {
             sum = sum + filtered[tx].price
         }
-        console.log(sum)
+        // console.log(sum)
         return sum;
     }
     useEffect(() => {
@@ -79,7 +79,7 @@ const HomeScreen = ({navigation}) => {
         tx.executeSql('SELECT * FROM tx_types', null,
             (txObj, resultSet) => {
                 setTxTypeLength(resultSet.rows._array.length);
-                console.log(resultSet.rows._array);
+                // console.log(resultSet.rows._array);
             },
             (txObj, error) => console.log(error)
         );

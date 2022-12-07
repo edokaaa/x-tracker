@@ -29,7 +29,7 @@ const AllTransactions = ({navigation}) => {
         tx.executeSql('SELECT * FROM transactions', null,
             (txObj, resultSet) => {
                 setTransactions(resultSet.rows._array);
-                console.log(transactions);
+                // console.log(transactions);
             },
             (txObj, error) => console.log(error)
         );
