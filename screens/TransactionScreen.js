@@ -6,9 +6,7 @@ import {FontAwesome5} from '@expo/vector-icons'
 
 import RenderHeader from '../components/ScreenHeader';
 import { COLORS } from '../constants';
-
-import * as SQLite from 'expo-sqlite';
-
+import { db } from '../data/Database'
 
 
 const AllTransactions = ({navigation}) => {
@@ -19,9 +17,8 @@ const AllTransactions = ({navigation}) => {
     })
   }, [])
 
-
   const [transactions, setTransactions] = useState([]);
-    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
+  
   useEffect(() => {
 
     // get all transactions

@@ -11,16 +11,13 @@ import { COLORS, FONTS } from '../constants';
 import { ScrollView } from 'react-native-gesture-handler'
 
 import CustomButton from '../components/CustomButton'
-import * as SQLite from 'expo-sqlite';
 
+import { db } from '../data/Database'
 
 // import {db, auth} from '../firebase'
 // import firebase from 'firebase'
 
 const AddScreen = ({navigation}) => {
-    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
-    // const [submitLoading, setSubmitLoading] = useState(false);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Add Expense',
@@ -35,7 +32,7 @@ const AddScreen = ({navigation}) => {
     //   setSubmitLoading(true);
         db.transaction(tx => {
             tx.executeSql('INSERT INTO transactions (description, type_id, price, addedtime) values (?, ?, ?, ?)',
-            [input, 1, amount, result],
+            [input, 2, amount, result],
             (txObj, resultSet) => {
                 clearInputFields();
                 navigation.navigate('Home');
@@ -98,6 +95,14 @@ const AddScreen = ({navigation}) => {
 
         <TextInput
           style={{...FONTS.h2, ...styles.input}}
+          keyboardType='numeric'
+          placeholder='Amount'
+          value={amount}
+          onChangeText={(text) => setAmount(text)}
+        />
+
+        <TextInput
+          style={{...FONTS.h2, ...styles.input}}
           placeholder='Description'
           value={input}
           onChangeText={(text) => setInput(text)}
@@ -113,14 +118,6 @@ const AddScreen = ({navigation}) => {
             onChange={onChange}
           />
         )}
-
-        <TextInput
-          style={{...FONTS.h2, ...styles.input}}
-          keyboardType='numeric'
-          placeholder='Amount'
-          value={amount}
-          onChangeText={(text) => setAmount(text)}
-        />
 
         <Text
           style={{...FONTS.h2, ...styles.input}}

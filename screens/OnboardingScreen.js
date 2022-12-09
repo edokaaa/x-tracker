@@ -1,14 +1,24 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import { COLORS} from '../constants';
 import LoginSVG from '../assets/images/misc/projections.svg';
 
+import * as SQLite from 'expo-sqlite';
+import { dropDbTables, createDbTables } from '../data/Database';
+
+
 
 const OnboardingScreen = ({navigation}) => {
+    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
+
     useEffect(() => {
+        // dropDbTables(db);
+        createDbTables(db);
+
         setTimeout(() => {
             navigation.navigate("Login");
         }, 5000);
+
     }, []);
 
     return (

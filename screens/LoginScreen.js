@@ -8,11 +8,9 @@ import LoginSVG from '../assets/images/misc/login.svg';
 import CustomButton from '../components/CustomButton';
 import UserInput from '../components/UserInput';
 
-import * as SQLite from 'expo-sqlite';
-
+import { db } from '../data/Database';
 
 const LoginScreen = ({navigation}) => {
-    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
     const [currentUser, setCurrentUser] = useState(undefined);
     const [isLoading, setIsLoading] = useState(true);
     const [password, setPassword] = useState(undefined);

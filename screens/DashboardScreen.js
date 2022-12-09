@@ -1,23 +1,16 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react'
-import {StyleSheet, View, TouchableOpacity} from 'react-native'
-import {Text, Avatar, ListItem} from 'react-native-elements'
-// import {auth, db} from '../firebase'
-import {StatusBar} from 'expo-status-bar'
-
-import {AntDesign, Feather, FontAwesome5} from '@expo/vector-icons'
-import CustomListItem from '../components/CustomListItem'
-
-import tx from '../data/Transactions'
-import { SafeAreaView } from 'react-native-safe-area-context'
-
+import React, {useEffect, useLayoutEffect, useState} from 'react';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {Text, Avatar, ListItem} from 'react-native-elements';
+import {AntDesign, Feather, FontAwesome5} from '@expo/vector-icons';
+import CustomListItem from '../components/CustomListItem';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { db } from '../data/Database';
 import { COLORS, FONTS } from '../constants';
-import { ScrollView } from 'react-native-gesture-handler'
+import { ScrollView } from 'react-native-gesture-handler';
 
-import * as SQLite from 'expo-sqlite';
 
 
 const HomeScreen = ({navigation}) => {
-    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
     const [transactions, setTransactions] = useState([]);
     const [user, setUser] = useState(undefined);
     const [totalIncome, setTotalIncome] = useState(0);
@@ -25,8 +18,6 @@ const HomeScreen = ({navigation}) => {
     const [totalBalance, setTotalBalance] = useState(0);
 
     const [txTypeLenght, setTxTypeLength] = useState(0);
-  
-    db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false, () => {});
 
     // total
     const getTypeTotal = (typeId) => {
@@ -65,16 +56,6 @@ const HomeScreen = ({navigation}) => {
         },
         (txObj, error) => console.log(error));
     });
-
-    // Transactions table
-    db.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER, price INTEGER, addedtime INTEGER)')
-    })
-
-    // Transaction Type table
-    db.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS tx_types (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
-    });
     db.transaction(tx => {
         tx.executeSql('SELECT * FROM tx_types', null,
             (txObj, resultSet) => {
@@ -84,14 +65,6 @@ const HomeScreen = ({navigation}) => {
             (txObj, error) => console.log(error)
         );
     })
-    if (txTypeLenght === 0) {
-        db.transaction(tx => {
-            tx.executeSql('INSERT INTO tx_types (name) values (?)', ['income']);
-        });
-        db.transaction(tx => {
-            tx.executeSql('INSERT INTO tx_types (name) values (?)', ['expense']);
-        });
-    }
 }, []);
 
 
@@ -119,7 +92,7 @@ const HomeScreen = ({navigation}) => {
               Total Balance
             </Text>
             <Text h3 style={{textAlign: 'center', color: COLORS.white, ...FONTS.h1}}>
-              $ {totalBalance?.toFixed(2)}
+              N {totalBalance?.toFixed(2)}
             </Text>
           </View>
           <View style={styles.cardBottom}>
@@ -137,7 +110,7 @@ const HomeScreen = ({navigation}) => {
                 </Text>
               </View>
               <Text style={{textAlign: 'center', ...FONTS.h2}}>
-                {`$ ${totalIncome?.toFixed(2)}`}
+                {`N ${totalIncome?.toFixed(2)}`}
               </Text>
             </View>
             <View>
@@ -148,7 +121,7 @@ const HomeScreen = ({navigation}) => {
                 </Text>
               </View>
               <Text style={{textAlign: 'center', ...FONTS.h2}}>
-                {`$ ${totalExpense?.toFixed(2)}`}
+                {`N ${totalExpense?.toFixed(2)}`}
               </Text>
             </View>
           </View>
@@ -166,8 +139,8 @@ const HomeScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
         {transactions?.length > 0 ? (
-          <View style={styles.recentTransactions}>
-            {transactions?.slice(-3).sort((a, b)=> b.id - a.id).map((transaction) => (
+          <ScrollView style={styles.recentTransactions}>
+            {transactions?.slice(-5).sort((a, b)=> b.id - a.id).map((transaction) => (
               <View key={transaction.id}>
                 <CustomListItem
                   transaction={transaction}
@@ -176,7 +149,7 @@ const HomeScreen = ({navigation}) => {
                 />
               </View>
             ))}
-          </View>
+          </ScrollView>
         ) : (
           <View style={styles.containerNull}>
             <FontAwesome5 name='list-alt' size={24} color={COLORS.secondary} />
@@ -185,6 +158,7 @@ const HomeScreen = ({navigation}) => {
             </Text>
           </View>
         )}
+
       {/* </View> */}
       </SafeAreaView>
     </>

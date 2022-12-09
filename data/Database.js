@@ -1,95 +1,73 @@
-import { Alert } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 
-export const db = SQLite.openDatabase(
-    {
-        name: 'MainDB',
-        location: 'default',
-    },
-    () => { },
-    error => { console.log(error) }
-);
+export const db = SQLite.openDatabase('xtracker.db');
 
-export const createDataBaseTables = () => {
-    try {
-        db.transaction( tx => {
-            tx.executeSql(
-                "CREATE TABLE IF NOT EXISTS "
-                + "Users "
-                + "(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
-            );
-            tx.executeSql(
-                "CREATE TABLE IF NOT EXISTS "
-                + "Transactions "
-                + "(id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, description TEXT, type_id INTEGER, price INTEGER, addedtime INTEGER, category_id INTEGER)"
-            );
-            tx.executeSql(
-                "CREATE TABLE IF NOT EXISTS "
-                + "Categories "
-                + "(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, type_id INTEGER)"
-            );
-            tx.executeSql(
-                "CREATE TABLE IF NOT EXISTS "
-                + "Types "
-                + "(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
-            );
-            tx.executeSql(
-                "INSERT INTO Types "
-                + "Values (?)",
-                ["income"]
-            );
-            tx.executeSql(
-                "INSERT INTO Types "
-                + "Values (?)",
-                ["expense"]
-            );
-            // filling transaction types
+export const createDbTables = () => {
+    // foriegn key settings
+    db.exec([{ sql: 'PRAGMA foreign_keys = ON;', args: [] }], false, () => {});
 
-            // set foriegn keys
+    // Users
+    db.transaction(tx => {
+        tx.executeSql('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)')
+    });
 
-            // tx.executeSql(
-            //     "INSERT INTO Users "
-            //     + "Values ('edoka', 'edoka')"
-            // );
-        });
-        Alert("DB tables created successfully!")
-    } catch(e) {
-        console.warn(e);
-    }
-}
+    // Categories table
+    db.transaction(tx => {
+        tx.executeSql('CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, icon TEXT, color TEXT)');
+    });
 
-export const createUser = (userName, password) => {
-    db.transaction(async (tx) => {
-        await tx.executeSql(
-            "INSERT INTO Users (username, password) values (?, ?)",
-            [userName, password]
-        );
+    // Transaction Type table
+    db.transaction(tx => {
+        tx.executeSql('CREATE TABLE IF NOT EXISTS tx_types (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
+    });
+    // inserting transaction types
+    db.transaction(tx => {
+        tx.executeSql('INSERT INTO tx_types (name) values (?)', ['income']);
+    });
+    db.transaction(tx => {
+        tx.executeSql('INSERT INTO tx_types (name) values (?)', ['expense']);
+    });
+
+    // Transactions table
+    db.transaction(tx => {
+        tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER, price INTEGER, addedtime INTEGER)')
     })
-    // Alert.alert("Registration successful");
 }
 
-export const getUser = (user_id) => {
-    user = db.transaction(async (tx) => {
-        // try {
-        await tx.executeSql(
-            "Select * from Users WHERE id = "+ user_id +";"
+export const dropDbTables = () => {
+    db.transaction(tx => {
+        tx.executeSql('DROP TABLE IF EXISTS transactions', null,
+        (txObj, resultSet) => {},
+        (txObj, error) => console.log(error)
         );
     });
-    return user;
+
+    db.transaction(tx => {
+        tx.executeSql('DROP TABLE IF EXISTS tx_types', null,
+        (txObj, resultSet) => {},
+        (txObj, error) => console.log(error)
+        );
+    });
+
+    db.transaction(tx => {
+        tx.executeSql('DROP TABLE IF EXISTS categories', null,
+        (txObj, resultSet) => {},
+        (txObj, error) => console.log(error)
+        );
+    });
+    
+    db.transaction(tx => {
+        tx.executeSql('DROP TABLE IF EXISTS users', null,
+        (txObj, resultSet) => {},
+        (txObj, error) => console.log(error)
+        );
+    });
+
 }
 
-export const getUserTransactions = (user_id) => {
-    tx = db.transaction(async (tx) => {
-        await tx.executeSql(
-            "Select * from Transactions WHERE user_id= "+ user_id +";"
-        );
-    });
-    return tx;
-}
 
 export default {
-    db,
-    createDataBaseTables,
-    createUser,
-    getUser
+    createDbTables,
+    dropDbTables,
+    db
 }

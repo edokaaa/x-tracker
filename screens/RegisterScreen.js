@@ -6,23 +6,14 @@ import FlagSVG from '../assets/images/misc/flagged.svg';
 
 import CustomButton from '../components/CustomButton';
 import UserInput from '../components/UserInput';
-
-import * as SQLite from 'expo-sqlite';
 import { ScrollView } from 'react-native-gesture-handler';
 
+import { db } from '../data/Database';
 
 const RegisterScreen = ({navigation}) => {
-    const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
-
     const [userName, setUserName] = useState(undefined);
     const [password, setPassword1] = useState(undefined);
     const [password2, setPassword2] = useState(undefined);
-
-    useEffect(() => {
-        db.transaction(tx => {
-            tx.executeSql('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)')
-        });
-    }, [db]);
 
     const validatePassword = () => {
         if (password !== password2) {
