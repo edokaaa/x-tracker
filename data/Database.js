@@ -30,7 +30,7 @@ export const createDbTables = () => {
 
     // Transactions table
     db.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER, price INTEGER, addedtime INTEGER)')
+        tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER, price INTEGER, addedtime TEXT)')
     })
 }
 

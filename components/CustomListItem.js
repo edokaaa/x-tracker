@@ -29,9 +29,7 @@ const CustomListItem = ({transaction, navigation, id}) => {
               {transaction?.description}
             </ListItem.Title>
             <ListItem.Subtitle>
-              {/* {new Date(transaction?.timestamp?.toDate()).toUTCString()} */}
-              {moment(transaction?.addedtime, "x").format("DD MMM YYYY")}
-              {/* {transaction?.timestamp} */}
+              {moment(transaction?.addedtime).format("DD MMM YYYY")}
             </ListItem.Subtitle>
           </ListItem.Content>
           <View>

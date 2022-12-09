@@ -13,6 +13,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import CustomButton from '../components/CustomButton'
 
 import { db } from '../data/Database'
+import moment from 'moment'
 
 // import {db, auth} from '../firebase'
 // import firebase from 'firebase'
@@ -31,8 +32,11 @@ const AddScreen = ({navigation}) => {
     if (input && amount && selDate && selectedType) {
     //   setSubmitLoading(true);
         db.transaction(tx => {
+            // console.log(selDate);
+            // console.log(Date(result));
+            // console.log(moment(Date(result)).format('DD/MM/YYYY'));
             tx.executeSql('INSERT INTO transactions (description, type_id, price, addedtime) values (?, ?, ?, ?)',
-            [input, 2, amount, result],
+            [input, 2, amount, selDate.toISOString()],
             (txObj, resultSet) => {
                 clearInputFields();
                 navigation.navigate('Home');
