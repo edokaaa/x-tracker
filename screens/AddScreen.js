@@ -13,30 +13,36 @@ import { ScrollView } from 'react-native-gesture-handler'
 import CustomButton from '../components/CustomButton'
 
 import { db } from '../data/Database'
-import moment from 'moment'
-
-// import {db, auth} from '../firebase'
-// import firebase from 'firebase'
 
 const AddScreen = ({navigation}) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Add Expense',
     })
-  }, [navigation])
+  }, [navigation]);
+
+  const [types, setTypes] = useState([])
+
+  useEffect(() => {
+    db.transaction(tx => {
+        tx.executeSql('SELECT * FROM tx_types', null,
+        (txObj, resultSet) => {
+            setTypes(resultSet.rows._array);
+        },
+        (txObj, error) => console.log(error))
+    });
+
+  }, [types]);
 
   const [input, setInput] = useState('')
   const [amount, setAmount] = useState('')
 
   const createTX = () => {
-    if (input && amount && selDate && selectedType) {
+    if (input && amount && selDate && selectedTypeId) {
     //   setSubmitLoading(true);
         db.transaction(tx => {
-            // console.log(selDate);
-            // console.log(Date(result));
-            // console.log(moment(Date(result)).format('DD/MM/YYYY'));
             tx.executeSql('INSERT INTO transactions (description, type_id, price, addedtime) values (?, ?, ?, ?)',
-            [input, 2, amount, selDate.toISOString()],
+            [input, selectedTypeId, amount, selDate.toISOString()],
             (txObj, resultSet) => {
                 clearInputFields();
                 navigation.navigate('Home');
@@ -54,7 +60,7 @@ const AddScreen = ({navigation}) => {
     setInput('')
     setAmount('')
     setSelDate(new Date())
-    setSelectedType('expense')
+    setSelectedTypeId(1)
     navigation.navigate('Home')
     // setSubmitLoading(false)
   }
@@ -77,7 +83,7 @@ const AddScreen = ({navigation}) => {
   const result = format(selDate, 'dd/MM/yyyy')
 
   // Select Dropdown
-  const [selectedType, setSelectedType] = useState('expense')
+  const [selectedTypeId, setSelectedTypeId] = useState('expense')
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
@@ -88,13 +94,14 @@ const AddScreen = ({navigation}) => {
       <View style={styles.inputContainer}>
       <Picker
         style={{height: 100, marginBottom: 30}} itemStyle={{height: 150}}
-          selectedValue={selectedType}
+          selectedValue={selectedTypeId}
           onValueChange={(itemValue, itemIndex) =>
-            setSelectedType(itemValue)
+            setSelectedTypeId(itemValue)
           }
         >
-          <Picker.Item label='Expense' value='expense' />
-          <Picker.Item label='Income' value='income' />
+            {types.map((type) => (
+                <Picker.Item key={type.id} label={type.name} value={type.id} />
+            ))}
         </Picker>
 
         <TextInput

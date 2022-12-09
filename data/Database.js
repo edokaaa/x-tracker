@@ -20,17 +20,27 @@ export const createDbTables = () => {
     db.transaction(tx => {
         tx.executeSql('CREATE TABLE IF NOT EXISTS tx_types (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
     });
+
     // inserting transaction types
     db.transaction(tx => {
-        tx.executeSql('INSERT INTO tx_types (name) values (?)', ['income']);
+        tx.executeSql('SELECT * FROM tx_types', null,
+        (txObj, resultSet) => {
+            if (resultSet.rows._array.length === 0) {
+                db.transaction(txx => {
+                    txx.executeSql('INSERT INTO tx_types (name) values (?)', ['income']);
+                });
+                db.transaction(txx => {
+                    txx.executeSql('INSERT INTO tx_types (name) values (?)', ['expense']);
+                });
+            }
+        },
+        (txObj, error) => console.log(error)
+        );
     });
-    db.transaction(tx => {
-        tx.executeSql('INSERT INTO tx_types (name) values (?)', ['expense']);
-    });
-
+    
     // Transactions table
     db.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER, price INTEGER, addedtime TEXT)')
+        tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER REFERENCES tx_types(id), price INTEGER, addedtime TEXT)')
     })
 }
 
@@ -56,12 +66,12 @@ export const dropDbTables = () => {
         );
     });
     
-    db.transaction(tx => {
-        tx.executeSql('DROP TABLE IF EXISTS users', null,
-        (txObj, resultSet) => {},
-        (txObj, error) => console.log(error)
-        );
-    });
+    // db.transaction(tx => {
+    //     tx.executeSql('DROP TABLE IF EXISTS users', null,
+    //     (txObj, resultSet) => {},
+    //     (txObj, error) => console.log(error)
+    //     );
+    // });
 
 }
 
