@@ -1,5 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 
+import categoriesData from './Categories';
+
 export const db = SQLite.openDatabase('xtracker.db');
 
 export const createDbTables = () => {
@@ -40,7 +42,7 @@ export const createDbTables = () => {
     
     // Transactions table
     db.transaction(tx => {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER REFERENCES tx_types(id), price INTEGER, addedtime TEXT)')
+        tx.executeSql('CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, type_id INTEGER REFERENCES tx_types(id), price INTEGER, addedtime TEXT, category_id INTEGER REFERENCES categories(id))')
     })
 }
 
@@ -75,6 +77,13 @@ export const dropDbTables = () => {
 
 }
 
+export const populateCategory = () => {
+    categoriesData.map((category) => (
+        db.transaction(tx => {
+            tx.executeSql('INSERT INTO categories (name, icon, color) VALUES (?, ?, ?)', [category.name, category.icon, category.color])
+        })
+    ));
+}
 
 export default {
     createDbTables,

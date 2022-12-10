@@ -14,6 +14,10 @@ import CustomButton from '../components/CustomButton'
 
 import { db } from '../data/Database'
 
+import DropDownPicker from 'react-native-dropdown-picker'
+
+import { FlatList } from 'react-native'
+
 const AddScreen = ({navigation}) => {
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -41,8 +45,8 @@ const AddScreen = ({navigation}) => {
     if (input && amount && selDate && selectedTypeId) {
     //   setSubmitLoading(true);
         db.transaction(tx => {
-            tx.executeSql('INSERT INTO transactions (description, type_id, price, addedtime) values (?, ?, ?, ?)',
-            [input, selectedTypeId, amount, selDate.toISOString()],
+            tx.executeSql('INSERT INTO transactions (description, type_id, price, addedtime, category_id) values (?, ?, ?, ?, ?)',
+            [input, selectedTypeId, amount, selDate.toISOString(), categoryId],
             (txObj, resultSet) => {
                 clearInputFields();
                 navigation.navigate('Home');
@@ -82,76 +86,111 @@ const AddScreen = ({navigation}) => {
   }
   const result = format(selDate, 'dd/MM/yyyy')
 
-  // Select Dropdown
+  // Select Tx Type
   const [selectedTypeId, setSelectedTypeId] = useState('expense')
+
+//   Select category
+const [open, setOpen] = useState(false);
+const [value, setValue] = useState(null);
+const [categories, setCategories] = useState([]);
+const [items, setItems] = useState([]);
+const [categoryId, setCategoryId] = useState(undefined)
+
+useEffect(() => {
+    db.transaction(tx => {
+        tx.executeSql('SELECT * FROM categories', null,
+        (txObj, resultSet) => {
+            setCategories(resultSet.rows._array);
+        },
+        (txObj, error) => console.log(error))
+    });
+    let cat_items = []
+    categories.map((category) => (
+        cat_items.push({label: category.name, value: category.id})
+    ));
+    setItems(cat_items);
+}, [categories]);
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
         <RenderHeader header={'Add Transactions'} sub={'Enter Transaction Details'} />
-    <ScrollView>
-    <KeyboardAvoidingView style={styles.container}>
-      <StatusBar style='dark' />
-      <View style={styles.inputContainer}>
-      <Picker
-        style={{height: 100, marginBottom: 30}} itemStyle={{height: 150}}
-          selectedValue={selectedTypeId}
-          onValueChange={(itemValue, itemIndex) =>
-            setSelectedTypeId(itemValue)
-          }
-        >
-            {types.map((type) => (
-                <Picker.Item key={type.id} label={type.name} value={type.id} />
-            ))}
-        </Picker>
+        <View style={styles.container}>
+            <View style={styles.inputContainer}>
+                <Picker
+                    style={{height: 100, marginBottom: 30}} itemStyle={{height: 150}}
+                    selectedValue={selectedTypeId}
+                    onValueChange={(itemValue, itemIndex) =>
+                        setSelectedTypeId(itemValue)
+                    }
+                >
+                    {types.map((type) => (
+                        <Picker.Item key={type.id} label={type.name} value={type.id} />
+                    ))}
+                </Picker>
 
-        <TextInput
-          style={{...FONTS.h2, ...styles.input}}
-          keyboardType='numeric'
-          placeholder='Amount'
-          value={amount}
-          onChangeText={(text) => setAmount(text)}
-        />
+                <TextInput
+                style={{...FONTS.h2, ...styles.input}}
+                keyboardType='numeric'
+                placeholder='Amount'
+                value={amount}
+                onChangeText={(text) => setAmount(text)}
+                />
 
-        <TextInput
-          style={{...FONTS.h2, ...styles.input}}
-          placeholder='Description'
-          value={input}
-          onChangeText={(text) => setInput(text)}
-        />
+                <TextInput
+                style={{...FONTS.h2, ...styles.input}}
+                placeholder='Description'
+                value={input}
+                onChangeText={(text) => setInput(text)}
+                />
 
-        {show && (
-          <DateTimePicker
-            testID='dateTimePicker'
-            value={selDate}
-            mode={mode}
-            is24Hour={true}
-            display='default'
-            onChange={onChange}
-          />
-        )}
+                {show && (
+                <DateTimePicker
+                    testID='dateTimePicker'
+                    value={selDate}
+                    mode={mode}
+                    is24Hour={true}
+                    display='default'
+                    onChange={onChange}
+                />
+                )}
+                <Text
+                    style={{...FONTS.body2, marginBottom: 5}}
+                    // editable={false}
+                >
+                    Select Category
+                </Text> 
 
-        <Text
-          style={{...FONTS.h2, ...styles.input}}
-          placeholder='Select Date'
-          value={result}
-          onPress={showDatepicker}
-          // editable={false}
-        >
-          {result ? result : new Date()}
-        </Text>
-      <CustomButton
-        label={'Add'}
-        onPress={createTX}
-        justifyContent={'center'}
-        width='100%'
-        />
-      </View>
+                <DropDownPicker
+                    style={{marginBottom:10}}
+                    open={open}
+                    value={value}
+                    items={items}
+                    setOpen={setOpen}
+                    setValue={setValue}
+                    setItems={setItems}
+                    onChangeValue={(value) => setCategoryId(value)}
+                />
 
-    </KeyboardAvoidingView>
-    </ScrollView>
+                <Text
+                    style={{...FONTS.h3, ...styles.input}}
+                    placeholder='Select Date'
+                    value={result}
+                    onPress={showDatepicker}
+                    // editable={false}
+                >
+                    Date: {result ? result : new Date()}
+                </Text> 
+
+                <CustomButton
+                    label={'Add'}
+                    onPress={createTX}
+                    justifyContent={'center'}
+                    width='100%'
+                />
+            </View>
+        </View>
     </View>
-
-  )
+  );
 }
 
 export default AddScreen
@@ -169,7 +208,7 @@ const styles = StyleSheet.create({
     width: 300,
   },
   input: {
-    height: 50,
+    height: 45,
     color: COLORS.primary,
     borderColor: COLORS.primary,
     borderBottomWidth: 2,

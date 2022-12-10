@@ -18,6 +18,8 @@ const AllTransactions = ({navigation}) => {
   }, [])
 
   const [transactions, setTransactions] = useState([]);
+// categories
+const [categories, setCategories] = useState([]);
   
   useEffect(() => {
 
@@ -27,6 +29,16 @@ const AllTransactions = ({navigation}) => {
             (txObj, resultSet) => {
                 setTransactions(resultSet.rows._array);
                 // console.log(transactions);
+            },
+            (txObj, error) => console.log(error)
+        );
+    });
+    // get transaction categories
+    db.transaction(tx => {
+        tx.executeSql('SELECT * FROM categories', null,
+            (txObj, resultSet) => {
+                setCategories(resultSet.rows._array);
+                // console.log(resultSet.rows._array);
             },
             (txObj, error) => console.log(error)
         );
@@ -45,6 +57,7 @@ const AllTransactions = ({navigation}) => {
                   transaction={transaction}
                   navigation={navigation}
                   id={transaction.id}
+                  category={categories.filter(c => c.id === transaction.id)[0]}
                 />
               </View>
             ))}

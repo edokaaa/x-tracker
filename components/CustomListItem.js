@@ -6,7 +6,7 @@ import ModalActions from './ModalActions'
 
 import moment from 'moment'
 
-const CustomListItem = ({transaction, navigation, id}) => {
+const CustomListItem = ({transaction, navigation, id, category}) => {
   const [modalVisible, setModalVisible] = useState(false)
 
   return (
@@ -30,6 +30,9 @@ const CustomListItem = ({transaction, navigation, id}) => {
             </ListItem.Title>
             <ListItem.Subtitle>
               {moment(transaction?.addedtime).format("DD MMM YYYY")}
+            </ListItem.Subtitle>
+            <ListItem.Subtitle>
+              {category?.name}
             </ListItem.Subtitle>
           </ListItem.Content>
           <View>

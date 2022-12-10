@@ -19,6 +19,9 @@ const HomeScreen = ({navigation}) => {
 
     const [txTypeLenght, setTxTypeLength] = useState(0);
 
+    // categories
+    const [categories, setCategories] = useState([]);
+
     // total
     const getTypeTotal = (typeId) => {
         let sum = 0;
@@ -40,6 +43,16 @@ const HomeScreen = ({navigation}) => {
                 (txObj, error) => console.log(error)
             );
         });
+        
+        db.transaction(tx => {
+            tx.executeSql('SELECT * FROM categories', null,
+                (txObj, resultSet) => {
+                    setCategories(resultSet.rows._array);
+                },
+                (txObj, error) => console.log(error)
+            );
+        });
+        
         setTotalIncome(getTypeTotal(1));
         setTotalExpense(getTypeTotal(2));
         setTotalBalance(totalIncome - totalExpense);
@@ -146,6 +159,7 @@ const HomeScreen = ({navigation}) => {
                   transaction={transaction}
                   navigation={navigation}
                   id={transaction.id}
+                  category={categories.filter(c => c.id === transaction.id)[0]}
                 />
               </View>
             ))}

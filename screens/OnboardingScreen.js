@@ -4,7 +4,7 @@ import { COLORS} from '../constants';
 import LoginSVG from '../assets/images/misc/projections.svg';
 
 import * as SQLite from 'expo-sqlite';
-import { dropDbTables, createDbTables } from '../data/Database';
+import { dropDbTables, populateCategory, createDbTables } from '../data/Database';
 
 
 
@@ -12,8 +12,9 @@ const OnboardingScreen = ({navigation}) => {
     const [db, setDb] = useState(SQLite.openDatabase('xtracker.db'));
 
     useEffect(() => {
-        // dropDbTables(db);
-        createDbTables(db);
+        // dropDbTables();
+        createDbTables();
+        // populateCategory();
 
         setTimeout(() => {
             navigation.navigate("Login");
