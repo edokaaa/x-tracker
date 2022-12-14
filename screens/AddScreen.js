@@ -87,7 +87,7 @@ const AddScreen = ({navigation}) => {
   const result = format(selDate, 'dd/MM/yyyy')
 
   // Select Tx Type
-  const [selectedTypeId, setSelectedTypeId] = useState('expense')
+  const [selectedTypeId, setSelectedTypeId] = useState(1)
 
 //   Select category
 const [open, setOpen] = useState(false);

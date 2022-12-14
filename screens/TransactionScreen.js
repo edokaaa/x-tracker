@@ -20,9 +20,9 @@ const AllTransactions = ({navigation}) => {
   const [transactions, setTransactions] = useState([]);
 // categories
 const [categories, setCategories] = useState([]);
+const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-
     // get all transactions
     db.transaction(tx => {
         tx.executeSql('SELECT * FROM transactions', null,
@@ -39,11 +39,20 @@ const [categories, setCategories] = useState([]);
             (txObj, resultSet) => {
                 setCategories(resultSet.rows._array);
                 // console.log(resultSet.rows._array);
+                setIsLoading(false);
             },
             (txObj, error) => console.log(error)
         );
-    })
+    });
   }, [transactions]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>Please wait...</Text>
+      </View>
+    );
+  }
 
   return (
     <>
