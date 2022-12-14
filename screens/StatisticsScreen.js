@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
     SafeAreaView,
     StyleSheet,
@@ -18,24 +18,44 @@ import {Svg} from 'react-native-svg';
 import { COLORS, FONTS, SIZES, icons, images } from '../constants';
 
 // components
-import RenderNavBar from "../components/NavBar";
 
 import RenderHeader from "../components/ScreenHeader";
 import CategoryHeaderSection from "../components/StatCategoryHeader";
 
 // data
-import categoriesData from "../data/Categories";
-
+import { db } from '../data/Database';
 
 const StatisticsScreen = () => {
-    const [categories, setCategories] = React.useState(categoriesData)
-    const [selectedCategory, setSelectedCategory] = React.useState(null)
+    const [categories, setCategories] = useState([])
+    const [transactions, setTransactions] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState(null)
+
+    useEffect(() => {
+        // get all transactions
+        db.transaction(tx => {
+            tx.executeSql('SELECT * FROM transactions', null,
+                (txObj, resultSet) => {
+                    setTransactions(resultSet.rows._array);
+                },
+                (txObj, error) => console.log(error)
+            );
+        });
+        
+        db.transaction(tx => {
+            tx.executeSql('SELECT * FROM categories', null,
+                (txObj, resultSet) => {
+                    setCategories(resultSet.rows._array);
+                },
+                (txObj, error) => console.log(error)
+            );
+        });
+    }, [transactions]);
 
     function processCategoryDataToDisplay() {
         // Filter expenses with "Confirmed" status
         let chartData = categories.map((item) => {
-            let confirmExpenses = item.expenses.filter(a => a.status == "C")
-            var total = confirmExpenses.reduce((a, b) => a + (b.total || 0), 0)
+            let confirmExpenses = transactions.filter(tx => tx.type_id == 2 && tx.category_id == item.id);
+            var total = confirmExpenses.reduce((a, b) => a + (b.price || 0), 0)
 
             return {
                 name: item.name,
@@ -210,7 +230,7 @@ const StatisticsScreen = () => {
 
                 {/* Expenses */}
                 <View style={{ justifyContent: 'center' }}>
-                    <Text style={{ color: (selectedCategory && selectedCategory.name == item.name) ? COLORS.white : COLORS.primary, ...FONTS.h3 }}>{item.y} USD - {item.label}</Text>
+                    <Text style={{ color: (selectedCategory && selectedCategory.name == item.name) ? COLORS.white : COLORS.primary, ...FONTS.h3 }}>N{item.y} - {item.label}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -240,11 +260,15 @@ const StatisticsScreen = () => {
                 {/* <View> */}
                     {renderChart()}
                     
+                    
                 {/* </View> */}
             </ScrollView>
             {/* t</FlatList> */}
             <View>
                 {renderExpenseSummary()}
+            </View>
+            <View style={{ marginTop: 50}}>
+
             </View>
             
         </View>
