@@ -189,7 +189,10 @@ useEffect(() => {
                 />
             </View>
         </View>
-    </View>
+        <View style={{ marginTop: 100}}>
+
+        </View>
+</View>
   );
 }
 
