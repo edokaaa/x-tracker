@@ -1,26 +1,21 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    SafeAreaView,
     StyleSheet,
-    ScrollView,
     View,
     Text,
-    Image,
     TouchableOpacity,
     FlatList,
-    Animated,
     Platform
 } from 'react-native';
 import { VictoryPie } from 'victory-native';
 
 import {Svg} from 'react-native-svg';
 
-import { COLORS, FONTS, SIZES, icons, images } from '../constants';
+import { COLORS, FONTS, SIZES } from '../constants';
 
 // components
 
 import RenderHeader from "../components/ScreenHeader";
-import CategoryHeaderSection from "../components/StatCategoryHeader";
 
 // data
 import { db } from '../data/Database';
@@ -236,11 +231,13 @@ const StatisticsScreen = () => {
         )
 
         return (
-            <View style={{ padding: SIZES.padding }}>
+            <View style={{ padding: SIZES.padding}}>
                 <FlatList
+                    ListHeaderComponent={renderChart()}
                     data={data}
                     renderItem={renderItem}
                     keyExtractor={item => `${item.id}`}
+                    showsVerticalScrollIndicator={false}
                 />
             </View>
 
@@ -250,27 +247,9 @@ const StatisticsScreen = () => {
     return (
         <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
             <RenderHeader header={'Statistics'} sub={'Summary'}/>
-            {/* <FlatList 
-            data={()=>{}}
-            renderItem={()=>{
-                renderChart()
-            }}
-            > */}
-            <ScrollView contentContainerStyle={{ paddingBottom: 10 }}>
-                {/* <View> */}
-                    {renderChart()}
-                    
-                    
-                {/* </View> */}
-            </ScrollView>
-            {/* t</FlatList> */}
-            <View>
+            <View style={{ marginBottom: 150}}>
                 {renderExpenseSummary()}
             </View>
-            <View style={{ marginTop: 50}}>
-
-            </View>
-            
         </View>
 
     )
