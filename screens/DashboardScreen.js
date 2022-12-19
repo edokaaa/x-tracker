@@ -4,10 +4,11 @@ import {Text, Avatar, ListItem} from 'react-native-elements';
 import {AntDesign, Feather, FontAwesome5} from '@expo/vector-icons';
 import CustomListItem from '../components/CustomListItem';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { db } from '../data/Database';
+import { db, getTypeTotal } from '../data/Database';
 import { COLORS, FONTS } from '../constants';
 import { ScrollView } from 'react-native-gesture-handler';
 
+import moment from 'moment';
 
 
 const HomeScreen = ({navigation}) => {
@@ -23,23 +24,16 @@ const HomeScreen = ({navigation}) => {
     const [categories, setCategories] = useState([]);
 
     // total
-    const getTypeTotal = (typeId) => {
-        let sum = 0;
-        let filtered = [...transactions].filter(tx => tx.type_id === typeId);
-    
-        for (let tx = 0; tx < filtered.length; tx++) {
-            sum = sum + filtered[tx].price
-        }
-        // console.log(sum)
-        return sum;
-    }
     useEffect(() => {
-        // get all transactions
+        // get todays transactions
         db.transaction(tx => {
             tx.executeSql('SELECT * FROM transactions', null,
                 (txObj, resultSet) => {
-                    setTransactions(resultSet.rows._array);
+                    const allTx = resultSet.rows._array;
+                    const today = new Date();
+                    setTransactions(allTx.filter(tx => moment(tx.addedtime).format("DD MMM YYYY") === moment(today).format("DD MMM YYYY")));
                 },
+
                 (txObj, error) => console.log(error)
             );
         });
@@ -53,8 +47,8 @@ const HomeScreen = ({navigation}) => {
             );
         });
         
-        setTotalIncome(getTypeTotal(1));
-        setTotalExpense(getTypeTotal(2));
+        setTotalIncome(getTypeTotal(1, transactions));
+        setTotalExpense(getTypeTotal(2, transactions));
         setTotalBalance(totalIncome - totalExpense);
     }, [transactions]);
     
@@ -102,7 +96,7 @@ const HomeScreen = ({navigation}) => {
         <View style={styles.card}>
           <View style={styles.cardTop}>
             <Text style={{textAlign: 'center', color: COLORS.white, ...FONTS.body2}}>
-              Total Balance
+              Today's Balance
             </Text>
             <Text h3 style={{textAlign: 'center', color: COLORS.white, ...FONTS.h1}}>
               N {totalBalance?.toFixed(2)}
@@ -116,10 +110,9 @@ const HomeScreen = ({navigation}) => {
                   style={{
                     textAlign: 'center',
                     marginLeft: 5,
-                    ...FONTS.body2
                   }}
                 >
-                  Income
+                  Today's Income
                 </Text>
               </View>
               <Text style={{textAlign: 'center', ...FONTS.h2}}>
@@ -130,7 +123,7 @@ const HomeScreen = ({navigation}) => {
               <View style={styles.cardBottomSame}>
                 <Feather name='arrow-up' size={24} color='red' />
                 <Text style={{textAlign: 'center', marginLeft: 5}}>
-                  Expense
+                  Today's Expense
                 </Text>
               </View>
               <Text style={{textAlign: 'center', ...FONTS.h2}}>

@@ -77,8 +77,21 @@ export const dropDbTables = () => {
 
 }
 
+export const getTypeTotal = (typeId, transactions) => {
+    let sum = 0;
+    let filtered = [...transactions].filter(tx => tx.type_id === typeId);
+
+    for (let tx = 0; tx < filtered.length; tx++) {
+        sum = sum + filtered[tx].price
+    }
+    // console.log(sum)
+    return sum;
+}
+
+
 export default {
     createDbTables,
     dropDbTables,
-    db
+    db,
+    getTypeTotal
 }

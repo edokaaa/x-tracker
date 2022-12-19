@@ -5,8 +5,12 @@ import {
     Text,
     TouchableOpacity,
     FlatList,
-    Platform
+    Platform,
+    Modal
 } from 'react-native';
+
+import {AntDesign, Feather, FontAwesome5} from '@expo/vector-icons';
+
 import { VictoryPie } from 'victory-native';
 
 import {Svg} from 'react-native-svg';
@@ -18,12 +22,20 @@ import { COLORS, FONTS, SIZES } from '../constants';
 import RenderHeader from "../components/ScreenHeader";
 
 // data
-import { db } from '../data/Database';
+import { db, getTypeTotal } from '../data/Database';
 
 const StatisticsScreen = () => {
     const [categories, setCategories] = useState([])
     const [transactions, setTransactions] = useState([])
     const [selectedCategory, setSelectedCategory] = useState(null)
+
+    const [totalIncome, setTotalIncome] = useState(0);
+    const [totalExpense, setTotalExpense] = useState(0);
+    const [totalBalance, setTotalBalance] = useState(0);
+
+    const [majorEx, setMajorExCat] = useState(undefined);
+    const [modalVisible, setModalVisible] = useState(false);
+
 
     useEffect(() => {
         // get all transactions
@@ -44,7 +56,26 @@ const StatisticsScreen = () => {
                 (txObj, error) => console.log(error)
             );
         });
+        setTotalIncome(getTypeTotal(1, transactions));
+        setTotalExpense(getTypeTotal(2, transactions));
+        setTotalBalance(totalIncome - totalExpense);
+
     }, [transactions]);
+
+    function getMax() {
+        let items = processCategoryDataToDisplay();
+        let max = 0;
+        let maxCat = undefined;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].y > max) {
+                max = items[i].y;
+                maxCat = items[i]
+            }
+            
+        }
+        return maxCat;
+
+    }
 
     function processCategoryDataToDisplay() {
         // Filter expenses with "Confirmed" status
@@ -69,6 +100,14 @@ const StatisticsScreen = () => {
 
         // Calculate percentage and repopulate chart data
         let finalChartData = filterChartData.map((item) => {
+            // if (majorEx) {
+            //     if (item.y > majorEx.y) {
+            //         setMajorExCat(item);
+            //     }
+            // } else {
+            //     setMajorExCat(item);
+            // }
+            // setMajorExCat(item);
             let percentage = (item.y / totalExpense * 100).toFixed(0)
             return {
                 label: `${percentage}%`,
@@ -233,7 +272,11 @@ const StatisticsScreen = () => {
         return (
             <View style={{ padding: SIZES.padding}}>
                 <FlatList
-                    ListHeaderComponent={renderChart()}
+                    // ListHeaderComponent={renderChart()}
+                    // ListHeaderComponent={
+                    //     <>
+                    //     </>
+                    // }
                     data={data}
                     renderItem={renderItem}
                     keyExtractor={item => `${item.id}`}
@@ -247,8 +290,100 @@ const StatisticsScreen = () => {
     return (
         <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
             <RenderHeader header={'Statistics'} sub={'Summary'}/>
-            <View style={{ marginBottom: 150}}>
+            <Modal
+                    // animationType='slide'
+                    transparent={true}
+                    visible={modalVisible}
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        // margin: 0,
+
+                    }}
+                    
+                >
+                    <View style={{
+                        backgroundColor: 'white',
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'flex-center',
+                        padding: 10,
+                    }}>
+                        {renderChart()}
+                        <TouchableOpacity
+                        onPress={() => setModalVisible(!modalVisible)}
+                    >
+                        <Text style={{...FONTS.h4}}>
+                            Close
+                        </Text>
+
+                    </TouchableOpacity>
+
+                    </View>
+                        
+
+                </Modal>
+
+            <View style={{ marginBottom: 200}}>
+            <View style={styles.card}>
+          <View style={styles.cardTop}>
+            <Text style={{textAlign: 'center', color: COLORS.white, ...FONTS.body2}}>
+              Total Balance
+            </Text>
+            <Text h3 style={{textAlign: 'center', color: COLORS.white, ...FONTS.h1}}>
+              N {totalBalance?.toFixed(2)}
+            </Text>
+          </View>
+          <View style={styles.cardBottom}>
+            <View>
+              <View style={styles.cardBottomSame}>
+                <Feather name='arrow-down' size={24} color={COLORS.green} />
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    marginLeft: 5,
+                    ...FONTS.body2
+                  }}
+                >
+                  Income
+                </Text>
+              </View>
+              <Text style={{textAlign: 'center', ...FONTS.h2}}>
+                {`N ${totalIncome?.toFixed(2)}`}
+              </Text>
+            </View>
+            <View>
+              <View style={styles.cardBottomSame}>
+                <Feather name='arrow-up' size={24} color='red' />
+                <Text style={{textAlign: 'center', marginLeft: 5}}>
+                  Expense
+                </Text>
+              </View>
+              <Text style={{textAlign: 'center', ...FONTS.h2}}>
+                {`N ${totalExpense?.toFixed(2)}`}
+              </Text>
+            </View>
+          </View>
+        </View>
                 {renderExpenseSummary()}
+                <View style={{...styles.result, marginBottom: 200}}>
+                    <TouchableOpacity
+                        onPress={() => setModalVisible(!modalVisible)}
+                    >
+                        <Text style={{...FONTS.h1}}>
+                            View Chart
+                        </Text>
+
+                    </TouchableOpacity>
+                    {/* <Text style={{...FONTS.h3}}>
+                        Your major expense category is
+                    </Text>
+                    <Text style={{...FONTS.h1}}>
+                        at
+                        {majorEx.name} at {majorEx.label}
+                    </Text> */}
+                </View>
             </View>
         </View>
 
@@ -265,7 +400,64 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 3,
-    }
+    },
+    result: {
+        alignItems: "center"
+    },
+    container: {
+      backgroundColor: 'white',
+      flex: 1,
+      alignItems: 'flex-start',
+      justifyContent: 'flex-start',
+      padding: 10,
+    },
+    fullName: {
+      flexDirection: 'row',
+    },
+    card: {
+      backgroundColor: COLORS.primary,
+      alignItems: 'center',
+      width: '100%',
+      padding: 20,
+      borderRadius: 20,
+      shadowColor: '#000',
+      shadowOffset: {width: 0, height: 2},
+      shadowOpacity: 0.23,
+      shadowRadius: 2.62,
+      elevation: 4,
+      marginVertical: 20,
+    },
+    cardTop: {
+      // backgroundColor: 'blue',
+      marginBottom: 20,
+    },
+    cardBottom: {
+      flexDirection: 'row',
+      justifyContent: 'space-evenly',
+      width: '100%',
+      margin: 'auto',
+      backgroundColor: COLORS.white,
+      borderRadius: 10,
+      padding: 10,
+    },
+    cardBottomSame: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    recentTitle: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
+    },
+    containerNull: {
+      alignItems: 'center',
+      marginTop: 50,
+      flex: 1,
+      width: '100%',
+    },
 })
 
 export default StatisticsScreen;
+

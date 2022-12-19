@@ -234,39 +234,8 @@ const renderColors = () => {
 
                     }}
                 >
-                    {/* <View style={{...styles.container, height:500, width: SIZES.width * 0.8}}> */}
-                        {/* <Text style={{...FONTS.h2}}>
-                            Add New Category
-                        </Text>
-                        <TextInput
-                            style={{...FONTS.h2, ...styles.input}}
-                            placeholder='Category Name'
-                            value={modalInput}
-                            onChangeText={(text) => setModalInput(text)}
-                        /> */}
-                        {/* <ColorPicker
-                            onColorSelected={color => alert(`Color selected: ${color}`)}
-                            style={{flex: 1}}
-                            sliderComponent={Slider}
-                            /> */}
-                            {/* {renderColors()} */}
-
-                            {/* <TouchableOpacity
-                            onPress={() => {}}
-                        >
-
-                            <Text style={{...FONTS.body2}}>Select Color</Text>
-                        </TouchableOpacity> */}
-
                         {renderColors()}
 
-                        {/* <TouchableOpacity
-                            onPress={() => setModalVisible(!modalVisible)}
-                        >
-                            <Text style={{...FONTS.body2}}>Close</Text>
-                        </TouchableOpacity> */}
-
-                    {/* </View> */}
                 </Modal>
                 <Picker
                     style={{height: 100, marginBottom: 30}} itemStyle={{height: 150}}
