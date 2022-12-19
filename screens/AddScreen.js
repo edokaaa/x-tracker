@@ -1,22 +1,18 @@
-import {StatusBar} from 'expo-status-bar'
 import React, {useEffect, useLayoutEffect, useState} from 'react'
-import {StyleSheet, View, KeyboardAvoidingView, TextInput} from 'react-native'
-import {Text, Button} from 'react-native-elements'
+import {StyleSheet, View, FlatList, TextInput, Modal, Alert, TouchableOpacity} from 'react-native'
+import {Text} from 'react-native-elements'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import format from 'date-fns/format'
 import {Picker} from '@react-native-picker/picker'
 
 import RenderHeader from '../components/ScreenHeader';
-import { COLORS, FONTS } from '../constants';
-import { ScrollView } from 'react-native-gesture-handler'
+import { COLORS, FONTS, SIZES } from '../constants';
 
 import CustomButton from '../components/CustomButton'
 
 import { db } from '../data/Database'
 
 import DropDownPicker from 'react-native-dropdown-picker'
-
-import { FlatList } from 'react-native'
 
 const AddScreen = ({navigation}) => {
   useLayoutEffect(() => {
@@ -50,6 +46,24 @@ const AddScreen = ({navigation}) => {
             (txObj, resultSet) => {
                 clearInputFields();
                 navigation.navigate('Home');
+            },
+            (txObj, error) => console.log(error));
+        });
+    } else {
+      alert('All fields are mandatory')
+    //   setSubmitLoading(false)
+    }
+  }
+
+  const createCat = () => {
+    if (modalInput && catColor) {
+        db.transaction(tx => {
+            tx.executeSql('INSERT INTO categories (name, icon, color) values (?, ?, ?)',
+            [modalInput, '', catColor],
+            (txObj, resultSet) => {
+                Alert.alert('added successfully');
+                setModalInput('');
+                setModalVisible(!modalVisible);
             },
             (txObj, error) => console.log(error));
         });
@@ -111,11 +125,149 @@ useEffect(() => {
     setItems(cat_items);
 }, [categories]);
 
+const [modalVisible, setModalVisible] = useState(false);
+const [modalInput, setModalInput] = useState('');
+const [catColor, setCatColor] = useState('');
+
+const renderColors = () => {
+        let data = Object.values(COLORS);
+        console.log(data);
+        const renderItem = ({ item }) => (
+            <TouchableOpacity
+                style={{
+                    // flexDirection: 'row',
+                    height: (catColor && catColor == item) ? 60 : 40,
+                    paddingHorizontal: SIZES.radius,
+                    borderRadius: 10,
+                    backgroundColor: COLORS.white
+                    
+                }}
+                onPress={() => {setCatColor(item)}}
+            >
+                {/* Name/Category */}
+                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                        style={{
+                            width: 20,
+                            height: 20,
+                            backgroundColor: item,
+                            borderRadius: 5
+                        }}
+                    />
+                </View>
+            </TouchableOpacity>
+        )
+        return (
+            <View style={{...styles.container, height:500, width: SIZES.width}}>
+
+                <FlatList
+                    ListHeaderComponent={
+                        <>
+                        <Text style={{...FONTS.h2}}>
+                            Add New Category
+                        </Text>
+                        <TextInput
+                            style={{...FONTS.h2, ...styles.input}}
+                            placeholder='Category Name'
+                            value={modalInput}
+                            onChangeText={(text) => setModalInput(text)}
+                        />
+                        <TouchableOpacity
+                            onPress={() => {}}
+                        >
+                            <Text style={{...FONTS.body2}}>Select Color</Text>
+                        </TouchableOpacity>
+
+                        </>
+                    }
+                    contentContainerStyle={{...styles.container}}
+                    // ListFooterComponentStyle={{...styles.container}}
+                    // ListHeaderComponentStyle={{...styles.container}}
+                    data={data}
+                    renderItem={renderItem}
+                    keyExtractor={item => `${item}`}
+                    showsVerticalScrollIndicator={false}
+                    // horizontal={true}
+                    numColumns={4}
+                    ListFooterComponent={
+                        <>
+                            <CustomButton
+                                label={'Add'}
+                                onPress={createCat}
+                                justifyContent={'center'}
+                                width='100%'
+                            />
+
+                        <TouchableOpacity
+                            onPress={() => setModalVisible(!modalVisible)}
+                        >
+                            <Text style={{...FONTS.body2}}>Close</Text>
+                        </TouchableOpacity>
+                        </>
+
+                    }
+                    
+                />
+                </View>
+        )
+    }
+
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.lightGray2, paddingTop: 20 }}>
         <RenderHeader header={'Add Transactions'} sub={'Enter Transaction Details'} />
         <View style={styles.container}>
             <View style={styles.inputContainer}>
+                <Modal
+                    // animationType='slide'
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                        Alert.alert('modal has been closed');
+                        setModalVisible(!modalVisible);
+                    }}
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        // margin: 0,
+
+                    }}
+                >
+                    {/* <View style={{...styles.container, height:500, width: SIZES.width * 0.8}}> */}
+                        {/* <Text style={{...FONTS.h2}}>
+                            Add New Category
+                        </Text>
+                        <TextInput
+                            style={{...FONTS.h2, ...styles.input}}
+                            placeholder='Category Name'
+                            value={modalInput}
+                            onChangeText={(text) => setModalInput(text)}
+                        /> */}
+                        {/* <ColorPicker
+                            onColorSelected={color => alert(`Color selected: ${color}`)}
+                            style={{flex: 1}}
+                            sliderComponent={Slider}
+                            /> */}
+                            {/* {renderColors()} */}
+
+                            {/* <TouchableOpacity
+                            onPress={() => {}}
+                        >
+
+                            <Text style={{...FONTS.body2}}>Select Color</Text>
+                        </TouchableOpacity> */}
+
+                        {renderColors()}
+
+                        {/* <TouchableOpacity
+                            onPress={() => setModalVisible(!modalVisible)}
+                        >
+                            <Text style={{...FONTS.body2}}>Close</Text>
+                        </TouchableOpacity> */}
+
+                    {/* </View> */}
+                </Modal>
                 <Picker
                     style={{height: 100, marginBottom: 30}} itemStyle={{height: 150}}
                     selectedValue={selectedTypeId}
@@ -153,12 +305,25 @@ useEffect(() => {
                     onChange={onChange}
                 />
                 )}
-                <Text
-                    style={{...FONTS.body2, marginBottom: 5}}
-                    // editable={false}
-                >
-                    Select Category
-                </Text> 
+                <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: 20,
+                }}>
+                    <Text
+                        style={{...FONTS.body2, marginBottom: 5}}
+                        // editable={false}
+                    >
+                        Select Category
+                    </Text> 
+                    <TouchableOpacity
+                        onPress={() => setModalVisible(!modalVisible)}
+                    >
+                        <Text style={{...FONTS.body2}}>Add New</Text>
+                    </TouchableOpacity>
+
+                </View>
 
                 <DropDownPicker
                     style={{marginBottom:10}}

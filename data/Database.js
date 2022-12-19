@@ -77,14 +77,6 @@ export const dropDbTables = () => {
 
 }
 
-export const populateCategory = () => {
-    categoriesData.map((category) => (
-        db.transaction(tx => {
-            tx.executeSql('INSERT INTO categories (name, icon, color) VALUES (?, ?, ?)', [category.name, category.icon, category.color])
-        })
-    ));
-}
-
 export default {
     createDbTables,
     dropDbTables,
